@@ -1,45 +1,47 @@
-async function main() {
-  // Load the MediaPipe handpose model.
-  const model = await handpose.load();
-  // Pass in a video stream (or an image, canvas, or 3D tensor) to obtain a
-  // hand prediction from the MediaPipe graph.
-  const predictions = await model.estimateHands(document.querySelector("video"));
-  if (predictions.length > 0) {
-    /*
-    `predictions` is an array of objects describing each detected hand, for example:
-    [
-      {
-        handInViewConfidence: 1, // The probability of a hand being present.
-        boundingBox: { // The bounding box surrounding the hand.
-          topLeft: [162.91, -17.42],
-          bottomRight: [548.56, 368.23],
-        },
-        landmarks: [ // The 3D coordinates of each hand landmark.
-          [472.52, 298.59, 0.00],
-          [412.80, 315.64, -6.18],
-          ...
-        ],
-        annotations: { // Semantic groupings of the `landmarks` coordinates.
-          thumb: [
-            [412.80, 315.64, -6.18]
-            [350.02, 298.38, -7.14],
-            ...
-          ],
-          ...
-        }
-      }
-    ]
-    */
+window.onload = () => {
+  const video  = document.querySelector("#camera");
+  const canvas = document.querySelector("#picture");
+  const se     = document.querySelector('#se');
 
-    for (let i = 0; i < predictions.length; i++) {
-      const keypoints = predictions[i].landmarks;
-
-      // Log hand keypoints.
-      for (let i = 0; i < keypoints.length; i++) {
-        const [x, y, z] = keypoints[i];
-        console.log(`Keypoint ${i}: [${x}, ${y}, ${z}]`);
-      }
+  /** カメラ設定 */
+  const constraints = {
+    audio: false,
+    video: {
+      width: 1280,
+      height: 720,
+      facingMode: "user"   // フロントカメラを利用する
+      // facingMode: { exact: "environment" }  // リアカメラを利用する場合
     }
-  }
-}
-main();
+  };
+
+  /**
+   * カメラを<video>と同期
+   */
+  navigator.mediaDevices.getUserMedia(constraints)
+  .then( (stream) => {
+    video.srcObject = stream;
+    video.onloadedmetadata = (e) => {
+      video.play();
+    };
+  })
+  .catch( (err) => {
+    console.log(err.name + ": " + err.message);
+  });
+
+  /**
+   * シャッターボタン
+   */
+   document.querySelector("#shutter").addEventListener("click", () => {
+    const ctx = canvas.getContext("2d");
+
+    // 演出的な目的で一度映像を止めてSEを再生する
+    video.pause();  // 映像を停止
+    se.play();      // シャッター音
+    setTimeout( () => {
+      video.play();    // 0.5秒後にカメラ再開
+    }, 500);
+
+    // canvasに画像を貼り付ける
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  });
+};
