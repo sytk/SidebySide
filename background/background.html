@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="style.css">
   <title>Camera Test</title>
+
   <style>
   canvas, video{
     border: 1px solid gray;
@@ -13,17 +14,22 @@
 <body>
 
 <h1>HTML5カメラ</h1>
+
 <section>
   <video id="camera"</video>
 </section>
-<!-- <canvas id="picture"></canvas> -->
-<!-- <form>
-  <button type="button" id="shutter">シャッター</button>
-</form> -->
 
-<!-- <audio id="se" preload="auto">
+<canvas id="picture" class="drag-and-drop"></canvas>
+
+<form>
+  <button type="button" id="shutter">シャッター</button>
+</form>
+
+<audio id="se" preload="auto">
   <source src="camera-shutter1.mp3" type="audio/mp3">
-</audio> -->
+</audio>
+
+<script src="https://riversun.github.io/jsframe/jsframe.js"></script>
 
 <script src="script.js"></script>
 
