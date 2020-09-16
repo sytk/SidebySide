@@ -1,77 +1,22 @@
-// function previewFile(file) {
-//   // プレビュー画像を追加する要素
-//   // const preview = document.getElementById('preview');
-//   const canvas = document.querySelector("#picture");
-//
-//   // FileReaderオブジェクトを作成
-//   const reader = new FileReader();
-//
-//   // ファイルが読み込まれたときに実行する
-//   reader.onload = function (e) {
-//     const imageUrl = e.target.result; // 画像のURLはevent.target.resultで呼び出せる
-//     const img = document.createElement("img"); // img要素を作成
-//     const ctx = canvas.getContext("2d");
-//     img.src = imageUrl; // 画像のURLをimg要素にセット
-//     //preview.appendChild(img); // #previewの中に追加
-//     img.onload = function(){
-//       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-//     }
-//   }
-//
-//   // いざファイルを読み込む
-//   reader.readAsDataURL(file);
-// }
-//
-//
-// // <input>でファイルが選択されたときの処理
-// const fileInput = document.getElementById('example');
-// const handleFileSelect = () => {
-//   const files = fileInput.files;
-//   for (let i = 0; i < files.length; i++) {
-//     previewFile(files[i]);
-//   }
-// }
-// if (fileInput) {
-//   fileInput.addEventListener('change', handleFileSelect);
-// }
-
-
-
 window.onload = () => {
+  console.log("window on load");
+
   const video  = document.querySelector("#camera");
   const canvas = document.querySelector("#picture");
-
-  var img = new Image();
 
 
   document.getElementById('file-sample').addEventListener('change', function (e) {
       // 1枚だけ表示する
       var file = e.target.files[0];
-
       // ファイルのブラウザ上でのURLを取得する
       var blobUrl = window.URL.createObjectURL(file);
-
       // img要素に表示
-      img = document.getElementById('picture');
+      var img = document.getElementById('picture');
       img.src = blobUrl;
-      // const ctx = canvas.getContext("2d");
-      //var img = new Image();
-      // img.src = "../dog.jpeg";
-
-      // ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      console.log("hello world!");
+      console.log("img update");
   });
 
-  console.log("hello world!");
-
-  // const ctx = canvas.getContext("2d");
-  //var img = new Image();
-  // img.src = "../dog.jpeg";
-
-  // img.onload = function(){
-  //   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  // }
-
+  // document.getElementById('loadFile').addEventListener('change', loadLocalFile);
 
   /** カメラ設定 */
   const constraints = {
@@ -97,17 +42,17 @@ window.onload = () => {
     console.log(err.name + ": " + err.message);
   });
 
-  /**
-  * シャッターボタン
-  */
-  document.querySelector("#shutter").addEventListener("click", () => {
-
-  // 演出的な目的で一度映像を止めてSEを再生する
-  video.pause();  // 映像を停止
-  setTimeout( () => {
-    video.play();    // 0.5秒後にカメラ再開
-  }, 500);
-  });
+  // /**
+  // * シャッターボタン
+  // */
+  // document.querySelector("#shutter").addEventListener("click", () => {
+  //
+  // // 演出的な目的で一度映像を止めてSEを再生する
+  // video.pause();  // 映像を停止
+  // setTimeout( () => {
+  //   video.play();    // 0.5秒後にカメラ再開
+  // }, 500);
+  // });
 
 }
 
@@ -181,3 +126,116 @@ function dragMoveListener (event) {
 
 // this function is used later in the resizing and gesture demos
 window.dragMoveListener = dragMoveListener
+
+var __PDF_DOC,
+	__CURRENT_PAGE,
+	__TOTAL_PAGES,
+	__PAGE_RENDERING_IN_PROGRESS = 0,
+	__CANVAS = $('#pdf-canvas').get(0),
+	__CANVAS_CTX = __CANVAS.getContext('2d');
+
+function showPDF(pdf_url) {
+	$("#pdf-loader").show();
+
+	PDFJS.getDocument({ url: pdf_url }).then(function(pdf_doc) {
+		__PDF_DOC = pdf_doc;
+		__TOTAL_PAGES = __PDF_DOC.numPages;
+
+		// Hide the pdf loader and show pdf container in HTML
+		$("#pdf-loader").hide();
+		$("#pdf-contents").show();
+		$("#pdf-total-pages").text(__TOTAL_PAGES);
+
+		// Show the first page
+		showPage(1);
+	}).catch(function(error) {
+		// If error re-show the upload button
+		$("#pdf-loader").hide();
+		$("#upload-button").show();
+
+		alert(error.message);
+	});;
+}
+
+function showPage(page_no) {
+	__PAGE_RENDERING_IN_PROGRESS = 1;
+	__CURRENT_PAGE = page_no;
+
+	// Disable Prev & Next buttons while page is being loaded
+	$("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
+
+	// While page is being rendered hide the canvas and show a loading message
+	$("#pdf-canvas").hide();
+	$("#page-loader").show();
+	$("#download-image").hide();
+
+	// Update current page in HTML
+	$("#pdf-current-page").text(page_no);
+
+	// Fetch the page
+	__PDF_DOC.getPage(page_no).then(function(page) {
+		// As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+		var scale_required = __CANVAS.width / page.getViewport(1).width;
+
+		// Get viewport of the page at required scale
+		var viewport = page.getViewport(scale_required);
+
+		// Set canvas height
+		__CANVAS.height = viewport.height;
+
+		var renderContext = {
+			canvasContext: __CANVAS_CTX,
+			viewport: viewport
+		};
+
+		// Render the page contents in the canvas
+		page.render(renderContext).then(function() {
+			__PAGE_RENDERING_IN_PROGRESS = 0;
+
+			// Re-enable Prev & Next buttons
+			$("#pdf-next, #pdf-prev").removeAttr('disabled');
+
+			// Show the canvas and hide the page loader
+			$("#pdf-canvas").show();
+			$("#page-loader").hide();
+			$("#download-image").show();
+		});
+	});
+}
+
+// Upon click this should should trigger click on the #file-to-upload file input element
+// This is better than showing the not-good-looking file input element
+$("#upload-button").on('click', function() {
+	$("#file-to-upload").trigger('click');
+});
+
+// When user chooses a PDF file
+$("#file-to-upload").on('change', function() {
+	// Validate whether PDF
+    if(['application/pdf'].indexOf($("#file-to-upload").get(0).files[0].type) == -1) {
+        alert('Error : Not a PDF');
+        return;
+    }
+
+	$("#upload-button").hide();
+
+	// Send the object url of the pdf
+	showPDF(URL.createObjectURL($("#file-to-upload").get(0).files[0]));
+});
+
+// Previous page of the PDF
+$("#pdf-prev").on('click', function() {
+	if(__CURRENT_PAGE != 1)
+		showPage(--__CURRENT_PAGE);
+});
+
+// Next page of the PDF
+$("#pdf-next").on('click', function() {
+	if(__CURRENT_PAGE != __TOTAL_PAGES)
+		showPage(++__CURRENT_PAGE);
+});
+
+// Download button
+$("#download-image").on('click', function() {
+	$(this).attr('href', __CANVAS.toDataURL()).attr('download', 'page.png');
+});
