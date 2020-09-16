@@ -1,7 +1,77 @@
+// function previewFile(file) {
+//   // プレビュー画像を追加する要素
+//   // const preview = document.getElementById('preview');
+//   const canvas = document.querySelector("#picture");
+//
+//   // FileReaderオブジェクトを作成
+//   const reader = new FileReader();
+//
+//   // ファイルが読み込まれたときに実行する
+//   reader.onload = function (e) {
+//     const imageUrl = e.target.result; // 画像のURLはevent.target.resultで呼び出せる
+//     const img = document.createElement("img"); // img要素を作成
+//     const ctx = canvas.getContext("2d");
+//     img.src = imageUrl; // 画像のURLをimg要素にセット
+//     //preview.appendChild(img); // #previewの中に追加
+//     img.onload = function(){
+//       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+//     }
+//   }
+//
+//   // いざファイルを読み込む
+//   reader.readAsDataURL(file);
+// }
+//
+//
+// // <input>でファイルが選択されたときの処理
+// const fileInput = document.getElementById('example');
+// const handleFileSelect = () => {
+//   const files = fileInput.files;
+//   for (let i = 0; i < files.length; i++) {
+//     previewFile(files[i]);
+//   }
+// }
+// if (fileInput) {
+//   fileInput.addEventListener('change', handleFileSelect);
+// }
+
+
 
 window.onload = () => {
   const video  = document.querySelector("#camera");
   const canvas = document.querySelector("#picture");
+
+  var img = new Image();
+
+
+  document.getElementById('file-sample').addEventListener('change', function (e) {
+      // 1枚だけ表示する
+      var file = e.target.files[0];
+
+      // ファイルのブラウザ上でのURLを取得する
+      var blobUrl = window.URL.createObjectURL(file);
+
+      // img要素に表示
+      img = document.getElementById('picture');
+      img.src = blobUrl;
+      // const ctx = canvas.getContext("2d");
+      //var img = new Image();
+      // img.src = "../dog.jpeg";
+
+      // ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      console.log("hello world!");
+  });
+
+  console.log("hello world!");
+
+  // const ctx = canvas.getContext("2d");
+  //var img = new Image();
+  // img.src = "../dog.jpeg";
+
+  // img.onload = function(){
+  //   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  // }
+
 
   /** カメラ設定 */
   const constraints = {
@@ -31,16 +101,14 @@ window.onload = () => {
   * シャッターボタン
   */
   document.querySelector("#shutter").addEventListener("click", () => {
-    const ctx = canvas.getContext("2d");
 
   // 演出的な目的で一度映像を止めてSEを再生する
   video.pause();  // 映像を停止
   setTimeout( () => {
     video.play();    // 0.5秒後にカメラ再開
   }, 500);
-
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   });
+
 }
 
 interact('.resize-drag')

@@ -6,8 +6,9 @@
   border-radius: 8px;
   padding: 20px; */
   touch-action: none;
+  /* background: url('../dog.jpeg') no-repeat; */
 
-  width: 120px;
+  width: 400px;
 
   /* This makes things *much* easier */
   box-sizing: border-box;
