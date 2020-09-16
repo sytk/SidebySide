@@ -1,3 +1,48 @@
+
+window.onload = () => {
+  const video  = document.querySelector("#camera");
+  const canvas = document.querySelector("#picture");
+
+  /** カメラ設定 */
+  const constraints = {
+    audio: false,
+    video: {
+      width: 1280,
+      height: 720,
+      facingMode: "user"   // フロントカメラを利用する
+      // facingMode: { exact: "environment" }  // リアカメラを利用する場合
+    }
+  };
+  /**
+   * カメラを<video>と同期
+   */
+  navigator.mediaDevices.getUserMedia(constraints)
+  .then( (stream) => {
+    video.srcObject = stream;
+    video.onloadedmetadata = (e) => {
+      video.play();
+    };
+  })
+  .catch( (err) => {
+    console.log(err.name + ": " + err.message);
+  });
+
+  /**
+  * シャッターボタン
+  */
+  document.querySelector("#shutter").addEventListener("click", () => {
+    const ctx = canvas.getContext("2d");
+
+  // 演出的な目的で一度映像を止めてSEを再生する
+  video.pause();  // 映像を停止
+  setTimeout( () => {
+    video.play();    // 0.5秒後にカメラ再開
+  }, 500);
+
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  });
+}
+
 interact('.resize-drag')
   .resizable({
     // resize from all edges and corners
@@ -49,3 +94,22 @@ interact('.resize-drag')
       })
     ]
   })
+
+function dragMoveListener (event) {
+  var target = event.target
+  // keep the dragged position in the data-x/data-y attributes
+  var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+  var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+
+  // translate the element
+  target.style.webkitTransform =
+    target.style.transform =
+      'translate(' + x + 'px, ' + y + 'px)'
+
+  // update the posiion attributes
+  target.setAttribute('data-x', x)
+  target.setAttribute('data-y', y)
+}
+
+// this function is used later in the resizing and gesture demos
+window.dragMoveListener = dragMoveListener
