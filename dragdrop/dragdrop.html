@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
@@ -12,39 +13,42 @@
 
 <body>
 
-<section>
-  <video id="camera"</video>
-</section>
+  <section>
+    <video id="camera"></video>
+  </section>
 
-<img id="picture" class="resize-drag"></img>
+  <!-- <img id="picture" class="resize-drag"></img> -->
 
-<input id="file-sample" type="file" id="example" multiple>
-<!-- <input id="file-pdf" type="file" accept=".pdf" id="pdf" multiple> -->
+  <input id="file-sample" type="file" id="example" multiple>
+  <!-- <input id="file-pdf" type="file" accept=".pdf" id="pdf" multiple> -->
 
-<button id="upload-button">Select PDF</button>
-<input type="file" id="file-to-upload" accept="application/pdf" />
+  <button id="upload-button">Select PDF</button>
+  <input type="file" id="file-to-upload" accept="application/pdf" />
 
-<div id="pdf-meta">
-  <div id="pdf-buttons">
+  <div id="pdf-meta">
+    <div id="pdf-buttons">
       <button id="pdf-prev">Previous</button>
       <button id="pdf-next">Next</button>
       <button id="pdf-hide">Hide</button>
       <button id="pdf-show">Show</button>
+    </div>
+    <!-- <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div> -->
   </div>
-  <!-- <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div> -->
-</div>
 
-<canvas id="pdf-canvas" width="400" class="resize-drag"></canvas>
+  <!-- <div id="material-containar"> -->
+    <!-- <canvas id="pdf-canvas" width="400" class="resize-drag"></canvas> -->
+  <!-- </div> -->
 
-    <!-- <div id="pdf-main-container" class="resize-drag"> -->
-        <!-- <div id="pdf-loader">Loading document ...</div> -->
-        <!-- <div id="pdf-contents"> -->
-            <!-- <canvas id="pdf-canvas" width="400"></canvas> -->
-            <!-- <div id="page-loader">Loading page ...</div> -->
-            <!-- <a id="download-image" href="#">Download PNG</a> -->
-        <!-- </div> -->
-    <!-- </div> -->
+  <!-- <div id="pdf-main-container" class="resize-drag"> -->
+  <!-- <div id="pdf-loader">Loading document ...</div> -->
+  <!-- <div id="pdf-contents"> -->
+  <!-- <canvas id="pdf-canvas" width="400"></canvas> -->
+  <!-- <div id="page-loader">Loading page ...</div> -->
+  <!-- <a id="download-image" href="#">Download PNG</a> -->
+  <!-- </div> -->
+  <!-- </div> -->
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
+
 </html>

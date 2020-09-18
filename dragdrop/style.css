@@ -8,6 +8,7 @@
   touch-action: none;
 
   width: 120px;
+  position: absolute;
 
   /* This makes things *much* easier */
   box-sizing: border-box;
