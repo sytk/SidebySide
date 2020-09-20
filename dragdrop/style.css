@@ -8,7 +8,8 @@
   touch-action: none;
   /* background: url('../dog.jpeg') no-repeat; */
 
-  width: 400px;
+  width: 120px;
+  position: absolute;
 
   /* This makes things *much* easier */
   box-sizing: border-box;
@@ -47,8 +48,6 @@ video {
   z-index: -1;
   transform: scale(-1, 1);
 }
-
-
 #upload-button {
 	width: 150px;
 	display: block;
@@ -118,4 +117,3 @@ video {
 	margin: 20px auto 0 auto;
 	font-size: 13px;
 	text-align: center;
-}
