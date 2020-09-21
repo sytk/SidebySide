@@ -150,6 +150,8 @@ function showPDF(pdfUrl) {
     canvas.dataset.page = 1;
     document.body.appendChild(canvas);
     showPage(1);
+    document.getElementById('pdf-hide').removeAttribute('disabled');
+    document.getElementById('pdf-show').removeAttribute('disabled');
   }).catch(function (error) {
     // If error re-show the upload button
     $("#pdf-loader").hide();
@@ -167,7 +169,16 @@ function showPage(pageNo) {
     canvas.dataset.page = pageNo;
 
   // Disable Prev & Next buttons while page is being loaded
-  $("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
+  if (canvas.dataset.page === '1') {
+    document.getElementById('pdf-prev').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-prev').removeAttribute('disabled');
+  }
+  if (canvas.dataset.page === canvas.dataset.numPages) {
+    document.getElementById('pdf-next').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-next').removeAttribute('disabled');
+  }
 
   // While page is being rendered hide the canvas and show a loading message
   $("#pdf-canvas").hide();
@@ -197,9 +208,6 @@ function showPage(pageNo) {
     // Render the page contents in the canvas
     page.render(renderContext).then(function () {
       // __PAGE_RENDERING_IN_PROGRESS = 0;
-
-      // Re-enable Prev & Next buttons
-      $("#pdf-next, #pdf-prev").removeAttr('disabled');
 
       // Show the canvas and hide the page loader
       $("#pdf-canvas").show();
@@ -232,18 +240,20 @@ $("#file-to-upload").on('change', function () {
 // Previous page of the PDFï￥
 $("#pdf-prev").on('click', function () {
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
-    currentPage = material.dataset.page;
-  if (currentPage != 1)
+    currentPage = parseInt(material.dataset.page);
+  if (currentPage !== 1) {
     showPage(--currentPage);
+  }
 });
 
 // Next page of the PDF
 $("#pdf-next").on('click', function () {
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
-    currentPage = material.dataset.page,
-    numPages = material.numPages;
-  if (currentPage != numPages)
+    currentPage = parseInt(material.dataset.page),
+    numPages = parseInt(material.dataset.numPages);
+  if (currentPage !== numPages) {
     showPage(++currentPage);
+  }
 });
 
 // Hide the PDF
