@@ -13,7 +13,6 @@ window.onload = () => {
       // facingMode: { exact: "environment" }  // リアカメラを利用する場合
     }
   };
-
   /**
    * カメラを<video>と同期
    */
@@ -45,11 +44,18 @@ async function load_model()
 async function track()
 {
     // const model = await handpose.load();
+    var frame = document.getElementById('video');
+    let w = frame.clientWidth;
+    let h = frame.clientHeight;
+    console.log(w,h);
+
     const predictions = await model.estimateHands(document.querySelector("video"));
-    console.log("img update");
+    // console.log("img update");
 
     var canvas = document.getElementById('mask');
     var ctx = canvas.getContext('2d');
+
+    // canvas.resizeTo(w, h);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -60,10 +66,10 @@ async function track()
           const keypoints = predictions[i].landmarks;
           for (let i = 0; i < keypoints.length; i++) {
             const [x, y, z] = keypoints[i];
-            ctx.fillRect(x/4, y/4, 10/4,10/4);
-            console.log(x,y);
+            ctx.fillRect(x, y, 10,10);
+            // console.log(x,y);
           }
-          console.log(keypoints[i][0]);
+          // console.log(keypoints[i][0]);
         }
       }
 

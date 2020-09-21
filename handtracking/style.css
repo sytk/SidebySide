@@ -34,8 +34,15 @@ video {
   position: absolute;
   top: 0;
   left: 0;
-  width: 1280pt;
-  height: 720pt;
+  /* width: 1280pt;
+  height: 720pt; */
+
+  /* width: auto;
+  height: auto;
+
+  min-width: 100%;
+  min-height: 100%; */
+
   /* min-width: 100%;
   min-height: 100%; */
   /* background-size: cover;
