@@ -50,12 +50,10 @@ async function track()
     console.log(w,h);
 
     const predictions = await model.estimateHands(document.querySelector("video"));
-    // console.log("img update");
+    console.log("img update");
 
     var canvas = document.getElementById('mask');
     var ctx = canvas.getContext('2d');
-
-    // canvas.resizeTo(w, h);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -72,7 +70,6 @@ async function track()
           // console.log(keypoints[i][0]);
         }
       }
-
     }
   }
 
