@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=no">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-  <script src="../pdf.js"></script>
-  <script src="../pdf.worker.js"></script>
-  <script src="script.js"></script>
+  <script src="pdf.js"></script>
+  <script src="pdf.worker.js"></script>
 
   <meta charset="UTF-8">
   <link rel="stylesheet" href="style.css">
@@ -15,40 +13,42 @@
 
 <body>
 
-<section>
-  <video id="camera"</video>
-</section>
+  <section>
+    <video id="camera"></video>
+  </section>
 
-<button id="upload-button">Select PDF</button>
-<input type="file" id="file-to-upload" accept="application/pdf" />
+  <!-- <img id="picture" class="resize-drag"></img> -->
 
-<div id="pdf-main-container">
-	<div id="pdf-loader">Loading document ...</div>
-	<div id="pdf-contents">
-		<div id="pdf-meta">
-			<div id="pdf-buttons">
-				<button id="pdf-prev">Previous</button>
-				<button id="pdf-next">Next</button>
-			</div>
-			<div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
-		</div>
-		<canvas id="pdf-canvas" width="400"></canvas>
-		<div id="page-loader">Loading page ...</div>
-		<a id="download-image" href="#">Download PNG</a>
-	</div>
-</div>
+  <input id="file-sample" type="file" id="example" multiple>
+  <!-- <input id="file-pdf" type="file" accept=".pdf" id="pdf" multiple> -->
 
-<img id="picture" class="resize-drag"></img>
-<img id="pdf" class="resize-drag"></img>
+  <button id="upload-button">Select PDF</button>
+  <input type="file" id="file-to-upload" accept="application/pdf" />
 
-<canvas id="canvas" class="resize-drag"></canvas>
+  <div id="pdf-meta">
+    <div id="pdf-buttons">
+      <button id="pdf-prev">Previous</button>
+      <button id="pdf-next">Next</button>
+      <button id="pdf-hide">Hide</button>
+      <button id="pdf-show">Show</button>
+    </div>
+    <!-- <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div> -->
+  </div>
 
-<!-- <form>
-  <button type="button" id="shutter">シャッター</button>
-</form> -->
+  <!-- <div id="material-containar"> -->
+    <!-- <canvas id="pdf-canvas" width="400" class="resize-drag"></canvas> -->
+  <!-- </div> -->
 
-<input id="file-sample" type="file" id="example" accept=".jpg" multiple>
-<input id="loadFile" type="file" accept=".pdf">
+  <!-- <div id="pdf-main-container" class="resize-drag"> -->
+  <!-- <div id="pdf-loader">Loading document ...</div> -->
+  <!-- <div id="pdf-contents"> -->
+  <!-- <canvas id="pdf-canvas" width="400"></canvas> -->
+  <!-- <div id="page-loader">Loading page ...</div> -->
+  <!-- <a id="download-image" href="#">Download PNG</a> -->
+  <!-- </div> -->
+  <!-- </div> -->
 
+  <script src="script.js"></script>
 </body>
+
 </html>
