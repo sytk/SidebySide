@@ -29,7 +29,7 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    load_model()
+    load_model();
   });
 };
 
@@ -38,27 +38,23 @@ async function load_model()
 {
   // Load the MediaPipe handpose model.
    model = await handpose.load();
-   await model.estimateHands(document.querySelector("video"));
 }
 
 async function track()
 {
     // const model = await handpose.load();
-    var frame = document.getElementById('video');
-    let w = frame.clientWidth;
-    let h = frame.clientHeight;
-    console.log(w,h);
-
     const predictions = await model.estimateHands(document.querySelector("video"));
     console.log("img update");
 
     var canvas = document.getElementById('mask');
     canvas.width = 1280;
     canvas.height = 720;
+
     var ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log(canvas.width, canvas.height);
+
+
     if (canvas.getContext) {
 
       if (predictions.length > 0) {
@@ -67,9 +63,7 @@ async function track()
           for (let i = 0; i < keypoints.length; i++) {
             const [x, y, z] = keypoints[i];
             ctx.fillRect(x, y, 10,10);
-            // console.log(x,y);
           }
-          // console.log(keypoints[i][0]);
         }
       }
     }
