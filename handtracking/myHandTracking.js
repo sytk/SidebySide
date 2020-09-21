@@ -53,10 +53,12 @@ async function track()
     console.log("img update");
 
     var canvas = document.getElementById('mask');
+    canvas.width = 1280;
+    canvas.height = 720;
     var ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    console.log(canvas.width, canvas.height);
     if (canvas.getContext) {
 
       if (predictions.length > 0) {
