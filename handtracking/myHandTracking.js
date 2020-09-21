@@ -1,4 +1,3 @@
-
 window.onload = () => {
   const video  = document.querySelector("video");
   const canvas = document.querySelector("#picture");
@@ -35,7 +34,6 @@ window.onload = () => {
   });
 };
 
-var flag = true;
 var model;
 async function load_model()
 {
@@ -64,7 +62,6 @@ async function track()
             const [x, y, z] = keypoints[i];
             ctx.fillRect(x/4, y/4, 10/4,10/4);
             console.log(x,y);
-
           }
           console.log(keypoints[i][0]);
         }
