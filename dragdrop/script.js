@@ -160,6 +160,8 @@ function showPDF(pdfUrl) {
 
     alert(error.message);
   });
+
+  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
 }
 
 function showPage(pageNo) {
@@ -240,6 +242,8 @@ function showImage(imgUrl) {
   document.getElementById('pdf-hide').removeAttribute('disabled');
   document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
+
+  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
 }
 
 // Upon click this should should trigger click on the #file-to-upload file input element
