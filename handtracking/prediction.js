@@ -5,24 +5,25 @@ window.onload = () => {
 };
 
 async function run(){
-  await tf.loadModel('./model/model.json').then(handleModel).catch(handleError);
+  tf.loadModel('./model.json').then(handleModel).catch(handleError);
   function handleModel(model) {
       // 正常に読み込まれた時の処理
       // 必要なら入出力shapeを保存
       height = model.inputs[0].shape[0];
       width = model.inputs[0].shape[1];
+      console.log(height, width);
       // modelの操作...
   }
-
   function handleError(error) {
       // エラー処理
+      console.log(error);
   }
       }
 
 async function track()
 {
     const model = await handpose.load();
-          console.log("done");
+    console.log("done");
 
     // const predictions = await model.estimateHands(document.querySelector("video"));
     //

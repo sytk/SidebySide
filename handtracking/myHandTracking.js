@@ -60,6 +60,8 @@ async function track()
       if (predictions.length > 0) {
         for (let i = 0; i < predictions.length; i++) {
           const keypoints = predictions[i].landmarks;
+          console.log(predictions[i].annotations);
+
           for (let i = 0; i < keypoints.length; i++) {
             const [x, y, z] = keypoints[i];
             ctx.fillRect(x, y, 10,10);
