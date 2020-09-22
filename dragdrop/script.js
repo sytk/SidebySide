@@ -152,6 +152,7 @@ function showPDF(pdfUrl) {
     showPage(1);
     document.getElementById('pdf-hide').removeAttribute('disabled');
     document.getElementById('pdf-show').removeAttribute('disabled');
+    document.getElementById('pdf-delete').removeAttribute('disabled');
   }).catch(function (error) {
     // If error re-show the upload button
     $("#pdf-loader").hide();
@@ -238,6 +239,7 @@ function showImage(imgUrl) {
   document.body.appendChild(canvas);
   document.getElementById('pdf-hide').removeAttribute('disabled');
   document.getElementById('pdf-show').removeAttribute('disabled');
+  document.getElementById('pdf-delete').removeAttribute('disabled');
 }
 
 // Upon click this should should trigger click on the #file-to-upload file input element
@@ -293,6 +295,17 @@ $("#pdf-hide").on('click', function () {
 $("#pdf-show").on('click', function () {
   $("#pdf-canvas").show();
 });
+
+document.getElementById('pdf-delete').onclick = function() {
+  let canvases = document.getElementsByClassName('resize-drag');
+  document.body.removeChild(canvases[currentMaterialIndex]);
+
+  materials.splice(currentMaterialIndex, 1);
+  for (let i = 0; i < canvases.length; i++) {
+    canvases[i].dataset.materialIndex = i;
+  }
+  currentMaterialIndex = 0;
+}
 
 // Download button
 // $("#download-image").on('click', function() {
