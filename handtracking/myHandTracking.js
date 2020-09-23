@@ -41,7 +41,7 @@ window.onload = () => {
 async function main() {
   // Load the MediaPipe handpose model assets.
   const landmark_model = await handpose.load();
-  const gesture_model = tf.loadModel('./model/model.json');
+  // const gesture_model = tf.loadModel('./model/model.json');
 
   const video = document.querySelector("video");
   const canvas = document.getElementById('mask');
@@ -53,9 +53,10 @@ async function main() {
   fps_ctx.font = '20pt Arial';
   canvas.width = 1280;
   canvas.height = 720;
+  handTracking();
 
   async function handTracking() {
-    ctx.fillStyle = "rgb(0, 255, 0)";
+    ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
     const predictions = await landmark_model.estimateHands(video);
@@ -77,26 +78,49 @@ async function main() {
       parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
     }
 
+    drawHand()
     if(hand_keypoints[16][1] < hand_keypoints[13][1])
       gesture = 5;
     else
       gesture = 0;
 
+
+    const fps = 1000 / (performance.now() - start);
+    fps_ctx.fillText(fps, 20, 70);
+    requestAnimationFrame(handTracking);
+  };
+  function drawHand()
+  {
+    const connections = [
+        [0, 1], [1, 2], [2, 3], [3, 4],
+        [5, 6], [6, 7], [7, 8],
+        [9, 10], [10, 11], [11, 12],
+        [13, 14], [14, 15], [15, 16],
+        [17, 18], [18, 19], [19, 20],
+        [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
+    ]
     if (canvas.getContext) {
       for(let i = 0; i < hand_keypoints.length; i++)
       {
         const [x,y] = hand_keypoints[i];
         ctx.fillRect(x, y, 10,10);
       }
-      ctx.fillStyle = "rgb(255,0, 0)";
+      ctx.fillStyle = "rgb(255,0,0)";
       ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
-    }
-    const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText(fps, 20, 70);
-    requestAnimationFrame(handTracking);
-  };
 
-  handTracking();
+      ctx.beginPath() ;
+      for(let i = 0; i < connections.length; i++)
+      {
+        const s = connections[i][0]
+        const t = connections[i][1]
+        ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
+        ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+      }
+      ctx.strokeStyle = "rgb(0,255,0)";
+      ctx.lineWidth = 3 ;
+      ctx.stroke() ;
+    }
+  }
 }
 
 
@@ -130,6 +154,7 @@ async function main() {
   }
 ]
 */
+
 // #        8   12  16  20
 // #        |   |   |   |
 // #        7   11  15  19
