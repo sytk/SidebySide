@@ -1,19 +1,25 @@
+const video = document.getElementById("camera");
+
+let currentMaterialIndex = 0;
+let materials = [];
+let fileNames = [];
+
 window.onload = () => {
   console.log("window on load");
 
-  const video = document.querySelector("#camera");
-  const canvas = document.querySelector("#picture");
+  // const video = document.querySelector("#camera");
+  // const canvas = document.querySelector("#picture");
 
-  document.getElementById('file-sample').addEventListener('change', function (e) {
-    // 1枚だけ表示する
-    let file = e.target.files[0];
-    // ファイルのブラウザ上でのURLを取得する
-    let blobUrl = window.URL.createObjectURL(file);
-    // img要素に表示
-    let img = document.getElementById('picture');
-    img.src = blobUrl;
-    console.log("img update");
-  });
+  // document.getElementById('file-sample').addEventListener('change', function (e) {
+  //   // 1枚だけ表示する
+  //   let file = e.target.files[0];
+  //   // ファイルのブラウザ上でのURLを取得する
+  //   let blobUrl = window.URL.createObjectURL(file);
+  //   // img要素に表示
+  //   let img = document.getElementById('picture');
+  //   img.src = blobUrl;
+  //   console.log("img update");
+  // });
 
   // document.getElementById('loadFile').addEventListener('change', loadLocalFile);
 
@@ -42,6 +48,67 @@ window.onload = () => {
     });
 }
 
+// モーダルウィンドウ表示
+function modalBlock() { document.getElementById('modal').style.display = 'block'; }
+
+// モーダルウィンドウ非表示
+function modalNone() { document.getElementById('modal').style.display = 'none'; }
+
+//drop zoneの実装
+function handleFileSelect(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+
+  document.getElementById('drop_text').style.display = "none";
+  document.getElementById('pdf-loader').style.display = "block";
+
+  files = evt.dataTransfer.files; // FileList object.
+
+  // 以下に必要なFile Objectのプロパティを記述
+  var output = [];
+  for (var i = 0, f; f = files[i]; i++) {
+    // output.push('<li><strong>', escape(f.name),  f.type ,'</li>');
+    if (/^image\/(png|jpeg|gif)$/.test(f.type)) {
+      var fr = new FileReader();
+      showIMGthumbnail(fr, f);
+      // ファイル読み込み
+      fr.readAsDataURL(f);
+      showImage(URL.createObjectURL(f));
+    } else if (f.type == 'application/pdf') {
+      fileNames.push(f.name);
+      showPDF(URL.createObjectURL(f));
+    }
+  }
+  document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+}
+
+function showIMGthumbnail(fr, file) {
+  var img = document.createElement('img');
+  var canvas = createThumbnailCanvas();
+  let canvasCtx = canvas.getContext('2d');
+  fr.tmpImg = img;
+  fr.onload = function () {
+    this.tmpImg.src = this.result;
+    this.tmpImg.onload = function () {
+      document.getElementById('pdf-loader').style.display = "none";
+      canvasCtx.drawImage(this, 0, 0, canvas.width, canvas.height);
+      drawFineName(canvasCtx, file.name);
+      // document.getElementById('drop_zone').appendChild(this);
+    }
+  }
+}
+
+function handleDragOver(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  evt.dataTransfer.dropEffect = 'copy';
+}
+
+// イベントリスナーを設定
+var dropZone = document.getElementById('drop_zone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
 let ratio = 0.75;
 
 interact('.resize-drag')
@@ -59,6 +126,7 @@ interact('.resize-drag')
         // target.style.width = event.rect.width + 'px'
         // target.style.height = event.rect.height + 'px'
 
+        let ratio = target.height / target.width;
         if (Math.abs(event.deltaRect.left) < Math.abs(event.deltaRect.top)) {
           target.style.width = event.rect.height / ratio + 'px'
           target.style.height = event.rect.height + 'px'
@@ -123,8 +191,6 @@ function dragMoveListener(event) {
 // this function is used later in the resizing and gesture demos
 window.dragMoveListener = dragMoveListener
 
-let currentMaterialIndex = 0;
-let pdfDocs = [];
   // __PAGE_RENDERING_IN_PROGRESS = 0;
 
 function showPDF(pdfUrl) {
@@ -132,12 +198,13 @@ function showPDF(pdfUrl) {
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   let canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  canvas.setAttribute('width', 400);
+  // canvas.setAttribute('width', 400);
+  canvas.width = 400;
   canvas.dataset.materialIndex = currentMaterialIndex;
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     // __PDF_DOC = pdf_doc;
-    pdfDocs.push(pdfDoc);
+    materials.push(pdfDoc);
     let numPages = pdfDoc.numPages;
     canvas.dataset.numPages = numPages;
 
@@ -150,6 +217,10 @@ function showPDF(pdfUrl) {
     canvas.dataset.page = 1;
     document.body.appendChild(canvas);
     showPage(1);
+    document.getElementById('pdf-hide').removeAttribute('disabled');
+    document.getElementById('pdf-show').removeAttribute('disabled');
+    document.getElementById('pdf-delete').removeAttribute('disabled');
+    showPDFthumbnail(); // ここにおかないとダメっぽい
   }).catch(function (error) {
     // If error re-show the upload button
     $("#pdf-loader").hide();
@@ -157,6 +228,56 @@ function showPDF(pdfUrl) {
 
     alert(error.message);
   });
+
+  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+}
+
+function showPDFthumbnail () {
+  // currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
+  let canvas = createThumbnailCanvas();
+  let canvasCtx = canvas.getContext('2d');
+
+  materials[currentMaterialIndex].getPage(1).then(function (page) {
+    // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+    let scaleRequired = canvas.width / page.getViewport(1).width;
+
+    // Get viewport of the page at required scale
+    let viewport = page.getViewport(scaleRequired);
+
+    // Set canvas height
+    // canvas.width = viewport.width;
+
+    let renderContext = {
+      canvasContext: canvasCtx,
+      viewport: viewport
+    };
+
+    document.getElementById('pdf-loader').style.display = "none";
+    // Render the page contents in the canvas
+    page.render(renderContext).then(function () {
+      drawFineName(canvasCtx, fileNames[currentMaterialIndex]);
+    });
+  });
+}
+
+function createThumbnailCanvas() {
+  let canvas = document.createElement("canvas");
+  canvas.classList.add('thumbnail');
+  canvas.setAttribute('width', 100);
+  canvas.setAttribute('height', 100);
+  document.getElementById('drop_zone').appendChild(canvas);
+  return canvas;
+}
+
+function drawFineName(canvasCtx, fileName) {
+  canvasCtx.fillStyle = "white";        // 塗りつぶす色
+  canvasCtx.fillRect(0, 75, 100, 25);    // 描画
+  // ファイル名描画
+  canvasCtx.fillStyle = "black";
+  canvasCtx.font = "10px 'ＭＳ ゴシック'";
+  canvasCtx.textAlign = "center";
+  canvasCtx.textBaseline = "middle";
+  canvasCtx.fillText(fileName, 50, 87, 95);
 }
 
 function showPage(pageNo) {
@@ -167,19 +288,28 @@ function showPage(pageNo) {
     canvas.dataset.page = pageNo;
 
   // Disable Prev & Next buttons while page is being loaded
-  $("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
+  if (canvas.dataset.page === '1') {
+    document.getElementById('pdf-prev').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-prev').removeAttribute('disabled');
+  }
+  if (canvas.dataset.page === canvas.dataset.numPages) {
+    document.getElementById('pdf-next').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-next').removeAttribute('disabled');
+  }
 
   // While page is being rendered hide the canvas and show a loading message
-  $("#pdf-canvas").hide();
-  $("#page-loader").show();
-  $("#download-image").hide();
+  // $("#pdf-canvas").hide();
+  // $("#page-loader").show();
+  // $("#download-image").hide();
 
   // Update current page in HTML
-  $("#pdf-current-page").text(pageNo);
+  // $("#pdf-current-page").text(pageNo);
 
   // Fetch the page
   // __PDF_DOC.getPage(page_no).then(function (page) {
-    pdfDocs[currentMaterialIndex].getPage(pageNo).then(function (page) {
+    materials[currentMaterialIndex].getPage(pageNo).then(function (page) {
     // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
     let scaleRequired = canvas.width / page.getViewport(1).width;
 
@@ -198,15 +328,38 @@ function showPage(pageNo) {
     page.render(renderContext).then(function () {
       // __PAGE_RENDERING_IN_PROGRESS = 0;
 
-      // Re-enable Prev & Next buttons
-      $("#pdf-next, #pdf-prev").removeAttr('disabled');
-
       // Show the canvas and hide the page loader
-      $("#pdf-canvas").show();
-      $("#page-loader").hide();
-      $("#download-image").show();
+      // $("#pdf-canvas").show();
+      // $("#page-loader").hide();
+      // $("#download-image").show();
     });
   });
+}
+
+function showImage(imgUrl) {
+  const canvas = document.createElement("canvas");
+  canvas.classList.add('resize-drag');
+  canvas.width = 400;
+  currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
+  canvas.dataset.materialIndex = currentMaterialIndex;
+
+  const canvasCtx = canvas.getContext('2d');
+  const img = new Image();
+  img.src = imgUrl;
+  img.onload = () => {
+    canvas.height = img.height = img.height * (canvas.width / img.width);
+    canvasCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+  materials.push(img);
+
+  canvas.dataset.page = 1;
+  canvas.dataset.numPages = 1;
+  document.body.appendChild(canvas);
+  document.getElementById('pdf-hide').removeAttribute('disabled');
+  document.getElementById('pdf-show').removeAttribute('disabled');
+  document.getElementById('pdf-delete').removeAttribute('disabled');
+
+  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
 }
 
 // Upon click this should should trigger click on the #file-to-upload file input element
@@ -217,33 +370,40 @@ $("#upload-button").on('click', function () {
 
 // When user chooses a PDF file
 $("#file-to-upload").on('change', function () {
-  // Validate whether PDF
-  if (['application/pdf'].indexOf($("#file-to-upload").get(0).files[0].type) == -1) {
-    alert('Error : Not a PDF');
-    return;
+  const file = document.getElementById('file-to-upload').files[0];
+  console.log(file);
+  switch (file.type) {
+    case 'application/pdf':
+      showPDF(URL.createObjectURL(file));
+      break;
+    case 'image/jpeg':
+    case 'image/png':
+    case 'image/gif':
+      showImage(URL.createObjectURL(file));
+      break;
+    default:
+      alert('Error : Not a PDF or Image');
+      break;
   }
-
-  // $("#upload-button").hide();
-
-  // Send the object url of the pdf
-  showPDF(URL.createObjectURL($("#file-to-upload").get(0).files[0]));
 });
 
 // Previous page of the PDFï￥
 $("#pdf-prev").on('click', function () {
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
-    currentPage = material.dataset.page;
-  if (currentPage != 1)
+    currentPage = parseInt(material.dataset.page);
+  if (currentPage !== 1) {
     showPage(--currentPage);
+  }
 });
 
 // Next page of the PDF
 $("#pdf-next").on('click', function () {
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
-    currentPage = material.dataset.page,
-    numPages = material.numPages;
-  if (currentPage != numPages)
+    currentPage = parseInt(material.dataset.page),
+    numPages = parseInt(material.dataset.numPages);
+  if (currentPage !== numPages) {
     showPage(++currentPage);
+  }
 });
 
 // Hide the PDF
@@ -255,6 +415,17 @@ $("#pdf-hide").on('click', function () {
 $("#pdf-show").on('click', function () {
   $("#pdf-canvas").show();
 });
+
+document.getElementById('pdf-delete').onclick = function() {
+  let canvases = document.getElementsByClassName('resize-drag');
+  document.body.removeChild(canvases[currentMaterialIndex]);
+
+  materials.splice(currentMaterialIndex, 1);
+  for (let i = 0; i < canvases.length; i++) {
+    canvases[i].dataset.materialIndex = i;
+  }
+  currentMaterialIndex = 0;
+}
 
 // Download button
 // $("#download-image").on('click', function() {
