@@ -21,7 +21,6 @@ window.onload = () => {
     video.srcObject = stream;
     video.onloadedmetadata = (e) => {
       video.play();
-      main();
     };
   })
   .catch( (err) => {
@@ -30,6 +29,7 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
+    main();
     //load_model()
   });
 };
@@ -38,25 +38,21 @@ async function main() {
   // Load the MediaPipe handpose model assets.
   console.log("load model")
   const model = await handpose.load();
-  
-  // Pass in a video stream to the model to obtain 
+
+  // Pass in a video stream to the model to obtain
   // a prediction from the MediaPipe graph.
   const video = document.querySelector("video");
-  // let hands = await model.estimateHands(video);
 
-  console.log("Done")
-
-  // Each hand object contains a `landmarks` property,
-  // which is an array of 21 3-D landmarks.
   async function handTracking() {
-    
+    const start = performance.now();
+
     var frame = document.getElementById('video');
     let w = frame.clientWidth;
     let h = frame.clientHeight;
-    console.log(w,h);
+    // console.log(w,h);
 
     const predictions = await model.estimateHands(video);
-    console.log("img update");
+    // console.log("img update");
 
     var canvas = document.getElementById('mask');
     canvas.width = 1280;
@@ -73,15 +69,14 @@ async function main() {
           for (let i = 0; i < keypoints.length; i++) {
             const [x, y, z] = keypoints[i];
             ctx.fillRect(x, y, 10,10);
-            // console.log(x,y);
           }
-          // console.log(keypoints[i][0]);
         }
       }
     }
+    console.log(1000 / (performance.now() - start) );
     requestAnimationFrame(handTracking);
   };
-  
+
   handTracking();
 }
 
