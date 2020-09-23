@@ -1,3 +1,10 @@
+let parm_pos = new Array(2);
+let gesture;
+let hand_keypoints = new Array(21);
+for(let i = 0; i < 21; i++) {
+  hand_keypoints[i] = new Array(2).fill(0);
+}
+
 window.onload = () => {
   const video  = document.querySelector("video");
   const canvas = document.querySelector("#picture");
@@ -36,92 +43,60 @@ window.onload = () => {
 
 async function main() {
   // Load the MediaPipe handpose model assets.
-  console.log("load model")
   const model = await handpose.load();
 
   // Pass in a video stream to the model to obtain
   // a prediction from the MediaPipe graph.
   const video = document.querySelector("video");
+  const canvas = document.getElementById('mask');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = 1280;
+  canvas.height = 720;
 
   async function handTracking() {
+    ctx.fillStyle = "rgb(0, 255, 0)";
+
     const start = performance.now();
-
-    var frame = document.getElementById('video');
-    let w = frame.clientWidth;
-    let h = frame.clientHeight;
-    // console.log(w,h);
-
     const predictions = await model.estimateHands(video);
-    // console.log("img update");
-
-    var canvas = document.getElementById('mask');
-    canvas.width = 1280;
-    canvas.height = 720;
-    var ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (canvas.getContext) {
-
-      if (predictions.length > 0) {
-        for (let i = 0; i < predictions.length; i++) {
-          const keypoints = predictions[i].landmarks;
-          for (let i = 0; i < keypoints.length; i++) {
-            const [x, y, z] = keypoints[i];
-            ctx.fillRect(x, y, 10,10);
-          }
+    if (predictions.length > 0) {
+      for (let i = 0; i < predictions.length; i++) {
+        const keypoints = predictions[i].landmarks;
+        for (let i = 0; i < keypoints.length; i++) {
+          const [x, y, z] = keypoints[i];
+          hand_keypoints[i][0] = x;
+          hand_keypoints[i][1] = y;
         }
       }
     }
+    for(let i = 0; i < 2; i++){
+      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
+    }
+
+    if(hand_keypoints[16][1] < hand_keypoints[13][1])
+      gesture = 5;
+    else
+      gesture = 0;
+
+    if (canvas.getContext) {
+      for(let i = 0; i < hand_keypoints.length; i++)
+      {
+        const [x,y] = hand_keypoints[i];
+        ctx.fillRect(x, y, 10,10);
+      }
+      ctx.fillStyle = "rgb(255,0, 0)";
+      ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+    }
+
     console.log(1000 / (performance.now() - start) );
     requestAnimationFrame(handTracking);
   };
 
   handTracking();
 }
-
-
-// var model;
-// async function load_model()
-// {
-//   // Load the MediaPipe handpose model.
-//    model = await handpose.load();
-//    await model.estimateHands(document.querySelector("video"));
-// }
-
-// async function track()
-// {
-//     // const model = await handpose.load();
-//     var frame = document.getElementById('video');
-//     let w = frame.clientWidth;
-//     let h = frame.clientHeight;
-//     console.log(w,h);
-
-//     const predictions = await model.estimateHands(document.querySelector("video"));
-//     console.log("img update");
-
-//     var canvas = document.getElementById('mask');
-//     canvas.width = 1280;
-//     canvas.height = 720;
-//     var ctx = canvas.getContext('2d');
-
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//     if (canvas.getContext) {
-
-//       if (predictions.length > 0) {
-//         for (let i = 0; i < predictions.length; i++) {
-//           const keypoints = predictions[i].landmarks;
-//           for (let i = 0; i < keypoints.length; i++) {
-//             const [x, y, z] = keypoints[i];
-//             ctx.fillRect(x, y, 10,10);
-//             // console.log(x,y);
-//           }
-//           // console.log(keypoints[i][0]);
-//         }
-//       }
-//     }
-// }
 
 
 // $("#button").on('click', function() {
@@ -154,3 +129,15 @@ async function main() {
   }
 ]
 */
+// #        8   12  16  20
+// #        |   |   |   |
+// #        7   11  15  19
+// #    4   |   |   |   |
+// #    |   6   10  14  18
+// #    3   |   |   |   |
+// #    |   5---9---13--17
+// #    2    \         /
+// #     \    \       /
+// #      1    \     /
+// #       \    \   /
+// #        ------0-
