@@ -30,6 +30,7 @@ window.onload = () => {
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
     load_model();
+    setInterval(track, 200);
   });
 };
 
@@ -53,7 +54,7 @@ async function track()
     var ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    ctx.fillStyle = "rgb(0, 255, 0)";
 
     if (canvas.getContext) {
 
@@ -73,7 +74,7 @@ async function track()
 
 $("#button").on('click', function() {
     // $("#file-to-upload").trigger('click');
-    setInterval(track, 200);
+    setInterval(track, 100);
 });
 
 /*

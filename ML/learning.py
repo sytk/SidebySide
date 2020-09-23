@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-import matplotlib.pyplot as plt
 
 X_train = np.load('./X_train.npy')
 Y_train = np.load('./Y_train.npy')
@@ -12,9 +11,20 @@ print(X_train.min())
 
 model = keras.Sequential([
     # keras.layers.Flatten(input_shape=(28, 28)),
+    keras.layers.Input(42),
     keras.layers.Dense(128, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
+#
+# inputs = keras.layers.Input(shape=(42))
+# x = keras.layers.Dense(128, activation='relu')(inputs)
+# outputs = keras.layers.Dense(10, activation='softmax')(x)
+
+# inputs = keras.layers.Dense(128, activation='relu', input_dim=42)
+# outputs = keras.layers.Dense(10, activation='softmax')(inputs)
+
+
+# model = keras.models.Model(inputs=inputs, outputs=outputs)
 
 model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
@@ -22,7 +32,7 @@ model.compile(optimizer='adam',
 
 model.fit(X_train,
              Y_train,
-            epochs=200,
+            epochs=100,
             batch_size=128,
             validation_data=(X_test, Y_test),
             verbose=2)

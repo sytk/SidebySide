@@ -1,45 +1,114 @@
-window.onload = () => {
-  track()
+let landmark_model = null;
+let gesture_model = null;
+let parm_pos = new Array(2);
+let gesture;
+let hand_keypoints = new Array(21);
+for(let i = 0; i < 21; i++) {
+  hand_keypoints[i] = new Array(2).fill(0);
+}
 
-  run()
+window.onload = () => {
+  const video  = document.querySelector("video");
+
+  /** カメラ設定 */
+  const constraints = {
+    audio: false,
+    video: {
+      width: 1280,
+      height: 720,
+      facingMode: "user"   // フロントカメラを利用する
+      // facingMode: { exact: "environment" }  // リアカメラを利用する場合
+    }
+  };
+  /**
+   * カメラを<video>と同期
+   */
+  navigator.mediaDevices.getUserMedia(constraints)
+  .then( (stream) => {
+    video.srcObject = stream;
+    video.onloadedmetadata = (e) => {
+      video.play();
+    };
+  })
+  .catch( (err) => {
+    console.log(err.name + ": " + err.message);
+  });
+
+  // run();
+
+  video.addEventListener('loadeddata', (event) => {
+    console.log('ready');
+    // load_model();
+    setInterval(track, 200);
+  });
 };
 
 async function run(){
-  tf.loadModel('./model.json').then(handleModel).catch(handleError);
-  function handleModel(model) {
-      // 正常に読み込まれた時の処理
-      // 必要なら入出力shapeを保存
-      height = model.inputs[0].shape[0];
-      width = model.inputs[0].shape[1];
-      console.log(height, width);
-      // modelの操作...
+  if(gesture_model == null)
+  {
+    tf.loadModel('./model/model.json').then(handleModel).catch(handleError);
+    function handleModel(model) {
+        gesture_model = model
+    }
+    function handleError(error) {
+        console.log(error);
+    }
   }
-  function handleError(error) {
-      // エラー処理
-      console.log(error);
-  }
-      }
+
+}
 
 async function track()
 {
-    const model = await handpose.load();
-    console.log("done");
+    if(landmark_model == null)
+      landmark_model = await handpose.load();
+    const predictions = await landmark_model.estimateHands(document.querySelector("video"));
 
-    // const predictions = await model.estimateHands(document.querySelector("video"));
-    //
-    // if (predictions.length > 0) {
-    //   for (let icvccvvvvvvvvvvvvvvvvvvvvv = 0; i < predictions.length; i++) {
-    //     const keypoints = predictions[i].landmarks;
-    //     for (let i = 0; i < keypoints.length; i++) {
-    //       const [x, y, z] = keypoints[i];
-    //       console.log(x,y,z);
-    //     }
-    //   }
-    // }
+    var canvas = document.getElementById('mask');
+    canvas.width = 1280;
+    canvas.height = 720;
 
-  }
+    var ctx = canvas.getContext('2d');
 
-$("#button").on('click', function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "rgb(0, 255, 0)";
+
+
+    if (predictions.length > 0) {
+      for (let i = 0; i < predictions.length; i++) {
+        const keypoints = predictions[i].landmarks;
+
+        for (let i = 0; i < keypoints.length; i++) {
+          const [x, y, z] = keypoints[i];
+          hand_keypoints[i][0] = x;
+          hand_keypoints[i][1] = y;
+        }
+      }
+    }
+    for(let i = 0; i < 2; i++)
+    {
+      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
+    }
+
+
+    if (canvas.getContext) {
+      for(let i = 0; i < hand_keypoints.length; i++)
+      {
+        const [x,y] = hand_keypoints[i];
+        ctx.fillRect(x, y, 10,10);
+      }
+      ctx.fillStyle = "rgb(255,0, 0)";
+      ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+    }
+    if(hand_keypoints[16][1] < hand_keypoints[13][1])
+      gesture = 5;
+    else
+      gesture = 0;
+    console.log(gesture);
+
+}
+
+$("#button").on('click', function()
+{
 });
 
 /*
@@ -67,3 +136,15 @@ $("#button").on('click', function() {
   }
 ]
 */
+// #        8   12  16  20
+// #        |   |   |   |
+// #        7   11  15  19
+// #    4   |   |   |   |
+// #    |   6   10  14  18
+// #    3   |   |   |   |
+// #    |   5---9---13--17
+// #    2    \         /
+// #     \    \       /
+// #      1    \     /
+// #       \    \   /
+// #        ------0-
