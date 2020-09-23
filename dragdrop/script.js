@@ -1,5 +1,11 @@
-const video = document.getElementById("camera");
+let parm_pos = new Array(2);
+let gesture;
+let hand_keypoints = new Array(21);
+for(let i = 0; i < 21; i++) {
+  hand_keypoints[i] = new Array(2).fill(0);
+}
 
+const video = document.getElementById("camera");
 let currentMaterialIndex = 0;
 let materials = [];
 let fileNames = [];
@@ -46,7 +52,11 @@ window.onload = () => {
     .catch((err) => {
       console.log(err.name + ": " + err.message);
     });
-}
+  video.addEventListener('loadeddata', (event) => {
+    console.log('ready');
+    main();
+  });
+};
 
 // モーダルウィンドウ表示
 function modalBlock() { document.getElementById('modal').style.display = 'block'; }
@@ -431,3 +441,88 @@ document.getElementById('pdf-delete').onclick = function() {
 // $("#download-image").on('click', function() {
 //     $(this).attr('href', __CANVAS.toDataURL()).attr('download', 'page.png');
 // });
+
+async function main() {
+  // Load the MediaPipe handpose model assets.
+  const landmark_model = await handpose.load();
+  // const gesture_model = tf.loadModel('./model/model.json');
+
+  const video = document.getElementById('camera');
+  const canvas = document.getElementById('mask');
+  const ctx = canvas.getContext('2d');
+
+  const fps_canvas = document.getElementById('fps');
+  const fps_ctx = fps_canvas.getContext('2d');
+
+  fps_ctx.font = '20pt Arial';
+  canvas.width = 1280;
+  canvas.height = 720;
+  handTracking();
+
+  async function handTracking() {
+    ctx.fillStyle = "rgb(0, 0, 255)";
+
+    const start = performance.now();
+    const predictions = await landmark_model.estimateHands(video);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
+
+    if (predictions.length > 0) {
+      for (let i = 0; i < predictions.length; i++) {
+        const keypoints = predictions[i].landmarks;
+        for (let i = 0; i < keypoints.length; i++) {
+          const [x, y, z] = keypoints[i];
+          hand_keypoints[i][0] = x;
+          hand_keypoints[i][1] = y;
+        }
+      }
+    }
+    for(let i = 0; i < 2; i++){
+      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
+    }
+
+    drawHand()
+    if(hand_keypoints[16][1] < hand_keypoints[13][1])
+      gesture = 5;
+    else
+      gesture = 0;
+
+
+    const fps = 1000 / (performance.now() - start);
+    fps_ctx.fillText(fps, 20, 70);
+    requestAnimationFrame(handTracking);
+  };
+  function drawHand()
+  {
+    const connections = [
+        [0, 1], [1, 2], [2, 3], [3, 4],
+        [5, 6], [6, 7], [7, 8],
+        [9, 10], [10, 11], [11, 12],
+        [13, 14], [14, 15], [15, 16],
+        [17, 18], [18, 19], [19, 20],
+        [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
+    ]
+    if (canvas.getContext) {
+      for(let i = 0; i < hand_keypoints.length; i++)
+      {
+        const [x,y] = hand_keypoints[i];
+        ctx.fillRect(x, y, 10,10);
+      }
+      ctx.fillStyle = "rgb(255,0,0)";
+      ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+
+      ctx.beginPath() ;
+      for(let i = 0; i < connections.length; i++)
+      {
+        const s = connections[i][0]
+        const t = connections[i][1]
+        ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
+        ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+      }
+      ctx.strokeStyle = "rgb(0,255,0)";
+      ctx.lineWidth = 3 ;
+      ctx.stroke() ;
+    }
+  }
+}
