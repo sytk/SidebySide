@@ -48,6 +48,45 @@ video {
   z-index: -1;
   transform: scale(-1, 1);
 }
+
+/* 背景？ */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+  /* ぼかし */
+  backdrop-filter: blur(15px);
+}
+
+.modal-content{
+  background-color: white;
+  width: 600px;
+  height: 300px;
+  margin: 15% auto;
+  border: none;
+  border-radius: 2rem;
+  text-align:center;
+}
+
+#drop_text,#pdf_loader {
+  font-size: 1rem;
+  line-height: 300px;
+  color: lightgrey;
+}
+
+.thumbnail {
+  margin-left: 20px;
+  margin-top: 30px;
+  border: solid 2px lightgray;
+  border-radius: 0.3rem;
+}
+
 #upload-button {
 	width: 150px;
 	display: block;

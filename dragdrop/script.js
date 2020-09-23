@@ -1,7 +1,13 @@
+const video = document.getElementById("camera");
+
+let currentMaterialIndex = 0;
+let pdfDocs = [];
+let fileNames = [];
+
 window.onload = () => {
   console.log("window on load");
 
-  const video = document.querySelector("#camera");
+  // const video = document.querySelector("#camera");
   const canvas = document.querySelector("#picture");
 
   document.getElementById('file-sample').addEventListener('change', function (e) {
@@ -35,12 +41,73 @@ window.onload = () => {
       video.srcObject = stream;
       video.onloadedmetadata = (e) => {
         video.play();
+        modalBlock();
       };
     })
     .catch((err) => {
       console.log(err.name + ": " + err.message);
     });
 }
+
+// モーダルウィンドウ表示
+function modalBlock() { document.getElementById('modal').style.display = 'block'; }
+
+// モーダルウィンドウ非表示
+function modalNone() { document.getElementById('modal').style.display = 'none'; }
+
+//drop zoneの実装
+function handleFileSelect(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+
+  document.getElementById('drop_text').style.display = "none";
+  document.getElementById('pdf-loader').style.display = "block";
+
+  files = evt.dataTransfer.files; // FileList object.
+
+  // 以下に必要なFile Objectのプロパティを記述
+  var output = [];
+  for (var i = 0, f; f = files[i]; i++) {
+    // output.push('<li><strong>', escape(f.name),  f.type ,'</li>');
+    if (/^image\/(png|jpeg|gif)$/.test(f.type)) {
+      var fr = new FileReader();
+      showIMGthumbnail(fr, f);
+      // ファイル読み込み
+      fr.readAsDataURL(f);
+    } else if (f.type == 'application/pdf') {
+      fileNames.push(f.name);
+      showPDF(URL.createObjectURL(f));
+    }
+  }
+  document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+}
+
+function showIMGthumbnail(fr, file) {
+  var img = document.createElement('img');
+  var canvas = createThumbnailCanvas();
+  let canvasCtx = canvas.getContext('2d');
+  fr.tmpImg = img;
+  fr.onload = function () {
+    this.tmpImg.src = this.result;
+    this.tmpImg.onload = function () {
+      document.getElementById('pdf-loader').style.display = "none";
+      canvasCtx.drawImage(this, 0, 0, canvas.width, canvas.height);
+      drawFineName(canvasCtx, file.name);
+      // document.getElementById('drop_zone').appendChild(this);
+    }
+  }
+}
+
+function handleDragOver(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  evt.dataTransfer.dropEffect = 'copy';
+}
+
+// イベントリスナーを設定
+var dropZone = document.getElementById('drop_zone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
 
 let ratio = 0.75;
 
@@ -123,8 +190,6 @@ function dragMoveListener(event) {
 // this function is used later in the resizing and gesture demos
 window.dragMoveListener = dragMoveListener
 
-let currentMaterialIndex = 0;
-let pdfDocs = [];
   // __PAGE_RENDERING_IN_PROGRESS = 0;
 
 function showPDF(pdfUrl) {
@@ -150,6 +215,7 @@ function showPDF(pdfUrl) {
     canvas.dataset.page = 1;
     document.body.appendChild(canvas);
     showPage(1);
+    showPDFthumbnail(); // ここにおかないとダメっぽい
   }).catch(function (error) {
     // If error re-show the upload button
     $("#pdf-loader").hide();
@@ -157,6 +223,54 @@ function showPDF(pdfUrl) {
 
     alert(error.message);
   });
+}
+
+function showPDFthumbnail () {
+  // currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
+  let canvas = createThumbnailCanvas();
+  let canvasCtx = canvas.getContext('2d');
+
+  pdfDocs[currentMaterialIndex].getPage(1).then(function (page) {
+    // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+    let scaleRequired = canvas.width / page.getViewport(1).width;
+
+    // Get viewport of the page at required scale
+    let viewport = page.getViewport(scaleRequired);
+
+    // Set canvas height
+    // canvas.width = viewport.width;
+
+    let renderContext = {
+      canvasContext: canvasCtx,
+      viewport: viewport
+    };
+
+    document.getElementById('pdf-loader').style.display = "none";
+    // Render the page contents in the canvas
+    page.render(renderContext).then(function () {
+      drawFineName(canvasCtx, fileNames[currentMaterialIndex]);
+    });
+  });
+}
+
+function createThumbnailCanvas() {
+  let canvas = document.createElement("canvas");
+  canvas.classList.add('thumbnail');
+  canvas.setAttribute('width', 100);
+  canvas.setAttribute('height', 100);
+  document.getElementById('drop_zone').appendChild(canvas);
+  return canvas;
+}
+
+function drawFineName(canvasCtx, fileName) {
+  canvasCtx.fillStyle = "white";        // 塗りつぶす色
+  canvasCtx.fillRect(0, 75, 100, 25);    // 描画
+  // ファイル名描画
+  canvasCtx.fillStyle = "black";
+  canvasCtx.font = "10px 'ＭＳ ゴシック'";
+  canvasCtx.textAlign = "center";
+  canvasCtx.textBaseline = "middle";
+  canvasCtx.fillText(fileName, 50, 87, 95);
 }
 
 function showPage(pageNo) {
@@ -179,7 +293,7 @@ function showPage(pageNo) {
 
   // Fetch the page
   // __PDF_DOC.getPage(page_no).then(function (page) {
-    pdfDocs[currentMaterialIndex].getPage(pageNo).then(function (page) {
+  pdfDocs[currentMaterialIndex].getPage(pageNo).then(function (page) {
     // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
     let scaleRequired = canvas.width / page.getViewport(1).width;
 
