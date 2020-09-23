@@ -8,18 +8,18 @@ window.onload = () => {
   console.log("window on load");
 
   // const video = document.querySelector("#camera");
-  const canvas = document.querySelector("#picture");
+  // const canvas = document.querySelector("#picture");
 
-  document.getElementById('file-sample').addEventListener('change', function (e) {
-    // 1枚だけ表示する
-    let file = e.target.files[0];
-    // ファイルのブラウザ上でのURLを取得する
-    let blobUrl = window.URL.createObjectURL(file);
-    // img要素に表示
-    let img = document.getElementById('picture');
-    img.src = blobUrl;
-    console.log("img update");
-  });
+  // document.getElementById('file-sample').addEventListener('change', function (e) {
+  //   // 1枚だけ表示する
+  //   let file = e.target.files[0];
+  //   // ファイルのブラウザ上でのURLを取得する
+  //   let blobUrl = window.URL.createObjectURL(file);
+  //   // img要素に表示
+  //   let img = document.getElementById('picture');
+  //   img.src = blobUrl;
+  //   console.log("img update");
+  // });
 
   // document.getElementById('loadFile').addEventListener('change', loadLocalFile);
 
@@ -73,6 +73,7 @@ function handleFileSelect(evt) {
       showIMGthumbnail(fr, f);
       // ファイル読み込み
       fr.readAsDataURL(f);
+      showImage(URL.createObjectURL(f));
     } else if (f.type == 'application/pdf') {
       fileNames.push(f.name);
       showPDF(URL.createObjectURL(f));
