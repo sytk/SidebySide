@@ -17,23 +17,6 @@
     <video id="camera"></video>
   </section>
 
-  <!-- モーダルウィンドウ -->
-  <div id="modal" class="modal">
-    <div class="modal-content" id="drop_zone">
-      <div class="modal-body">
-        <!-- <p>upload here!</p> -->
-        <output id="list"></output>
-        <form id="my_form" enctype=multipart/form-data>
-            <!-- <input type="file" id="input_file"style="display:inline" name="upload_file enctype=multipart/form-data">
-            <br>
-            <button type="button" id="upload_button"onclick="file_upload()">アップロード</button> -->
-            <div id="drop_text">ここにファイルをドロップ</div>
-            <div id="pdf-loader">Loading document ...</div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- <img id="picture" class="resize-drag"></img> -->
 
   <input id="file-sample" type="file" id="example" multiple>
@@ -64,6 +47,24 @@
   <!-- <a id="download-image" href="#">Download PNG</a> -->
   <!-- </div> -->
   <!-- </div> -->
+
+  <!-- モーダルウィンドウ -->
+  <div id="modal" class="modal">
+    <div class="modal-content" id="drop_zone">
+      <div class="modal-body">
+        <!-- <p>upload here!</p> -->
+        <output id="list"></output>
+        <form id="my_form" enctype=multipart/form-data>
+            <!-- <input type="file" id="input_file"style="display:inline" name="upload_file enctype=multipart/form-data">
+            <br>
+            <button type="button" id="upload_button"onclick="file_upload()">アップロード</button> -->
+            <div id="drop_text">ここにファイルをドロップ</div>
+            <div id="pdf-loader">Loading document ...</div>
+            <button id="start-show" onclick="modalNone()">start</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

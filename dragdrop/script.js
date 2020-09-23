@@ -41,7 +41,6 @@ window.onload = () => {
       video.srcObject = stream;
       video.onloadedmetadata = (e) => {
         video.play();
-        modalBlock();
       };
     })
     .catch((err) => {
