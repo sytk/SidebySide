@@ -21,6 +21,7 @@ window.onload = () => {
     video.srcObject = stream;
     video.onloadedmetadata = (e) => {
       video.play();
+      main();
     };
   })
   .catch( (err) => {
@@ -29,53 +30,109 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    load_model();
-    setInterval(track, 200);
+    //load_model()
   });
 };
 
-var model;
-async function load_model()
-{
-  // Load the MediaPipe handpose model.
-   model = await handpose.load();
-}
+async function main() {
+  // Load the MediaPipe handpose model assets.
+  console.log("load model")
+  const model = await handpose.load();
+  
+  // Pass in a video stream to the model to obtain 
+  // a prediction from the MediaPipe graph.
+  const video = document.querySelector("video");
+  // let hands = await model.estimateHands(video);
 
-async function track()
-{
-    // const model = await handpose.load();
-    const predictions = await model.estimateHands(document.querySelector("video"));
+  console.log("Done")
+
+  // Each hand object contains a `landmarks` property,
+  // which is an array of 21 3-D landmarks.
+  async function handTracking() {
+    
+    var frame = document.getElementById('video');
+    let w = frame.clientWidth;
+    let h = frame.clientHeight;
+    console.log(w,h);
+
+    const predictions = await model.estimateHands(video);
     console.log("img update");
 
     var canvas = document.getElementById('mask');
     canvas.width = 1280;
     canvas.height = 720;
-
     var ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "rgb(0, 255, 0)";
 
     if (canvas.getContext) {
 
       if (predictions.length > 0) {
         for (let i = 0; i < predictions.length; i++) {
           const keypoints = predictions[i].landmarks;
-          console.log(predictions[i].annotations);
-
           for (let i = 0; i < keypoints.length; i++) {
             const [x, y, z] = keypoints[i];
             ctx.fillRect(x, y, 10,10);
+            // console.log(x,y);
           }
+          // console.log(keypoints[i][0]);
         }
       }
     }
-  }
+    requestAnimationFrame(handTracking);
+  };
+  
+  handTracking();
+}
 
-$("#button").on('click', function() {
-    // $("#file-to-upload").trigger('click');
-    setInterval(track, 100);
-});
+
+// var model;
+// async function load_model()
+// {
+//   // Load the MediaPipe handpose model.
+//    model = await handpose.load();
+//    await model.estimateHands(document.querySelector("video"));
+// }
+
+// async function track()
+// {
+//     // const model = await handpose.load();
+//     var frame = document.getElementById('video');
+//     let w = frame.clientWidth;
+//     let h = frame.clientHeight;
+//     console.log(w,h);
+
+//     const predictions = await model.estimateHands(document.querySelector("video"));
+//     console.log("img update");
+
+//     var canvas = document.getElementById('mask');
+//     canvas.width = 1280;
+//     canvas.height = 720;
+//     var ctx = canvas.getContext('2d');
+
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//     if (canvas.getContext) {
+
+//       if (predictions.length > 0) {
+//         for (let i = 0; i < predictions.length; i++) {
+//           const keypoints = predictions[i].landmarks;
+//           for (let i = 0; i < keypoints.length; i++) {
+//             const [x, y, z] = keypoints[i];
+//             ctx.fillRect(x, y, 10,10);
+//             // console.log(x,y);
+//           }
+//           // console.log(keypoints[i][0]);
+//         }
+//       }
+//     }
+// }
+
+
+// $("#button").on('click', function() {
+//     // $("#file-to-upload").trigger('click');
+//     setInterval(track, 200);
+// });
 
 /*
 `predictions` is an array of objects describing each detected hand, for example:
