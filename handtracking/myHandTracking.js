@@ -7,8 +7,6 @@ for(let i = 0; i < 21; i++) {
 
 window.onload = () => {
   const video  = document.querySelector("video");
-  const canvas = document.querySelector("#picture");
-  const se     = document.querySelector('#se');
 
   /** カメラ設定 */
   const constraints = {
@@ -37,20 +35,22 @@ window.onload = () => {
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
     main();
-    //load_model()
   });
 };
 
 async function main() {
   // Load the MediaPipe handpose model assets.
-  const model = await handpose.load();
+  const landmark_model = await handpose.load();
+  const gesture_model = tf.loadModel('./model/model.json');
 
-  // Pass in a video stream to the model to obtain
-  // a prediction from the MediaPipe graph.
   const video = document.querySelector("video");
   const canvas = document.getElementById('mask');
   const ctx = canvas.getContext('2d');
 
+  const fps_canvas = document.getElementById('fps');
+  const fps_ctx = fps_canvas.getContext('2d');
+
+  fps_ctx.font = '20pt Arial';
   canvas.width = 1280;
   canvas.height = 720;
 
@@ -58,9 +58,10 @@ async function main() {
     ctx.fillStyle = "rgb(0, 255, 0)";
 
     const start = performance.now();
-    const predictions = await model.estimateHands(video);
+    const predictions = await landmark_model.estimateHands(video);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
 
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
@@ -90,8 +91,8 @@ async function main() {
       ctx.fillStyle = "rgb(255,0, 0)";
       ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
     }
-
-    console.log(1000 / (performance.now() - start) );
+    const fps = 1000 / (performance.now() - start);
+    fps_ctx.fillText(fps, 20, 70);
     requestAnimationFrame(handTracking);
   };
 

@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5"></script>
+
   <!-- Require the peer dependencies of handpose. -->
   <script src="https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js"></script>
   <script src="https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js"></script>
@@ -27,6 +29,7 @@
 <div class="fullscreen">
   <video id="video"></video>
   <canvas id="mask"class="mask"></canvas>
+  <canvas id="fps" class="fps"></canvas>
 </div>
 
 <button id="button">track</button>
