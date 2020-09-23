@@ -29,6 +29,11 @@
     <canvas id="fps" class="fps"></canvas>
   </div>
 
+  <input type="button" value="表示"
+       onclick="document.getElementById('mask').style.visibility = 'visible';">
+  <input type="button" value="非表示"
+       onclick="document.getElementById('mask').style.visibility = 'hidden';">
+
   <button id="upload-button">Select PDF or Image</button>
   <input type="file" id="file-to-upload" accept="application/pdf, image/jpeg, image/png, image/gif" />
 
