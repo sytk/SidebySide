@@ -41,6 +41,7 @@ window.onload = () => {
       video.srcObject = stream;
       video.onloadedmetadata = (e) => {
         video.play();
+        modalBlock();
       };
     })
     .catch((err) => {
@@ -59,8 +60,8 @@ function handleFileSelect(evt) {
   evt.stopPropagation();
   evt.preventDefault();
 
-  document.getElementById('drop_text').style.display = "none";
-  document.getElementById('pdf-loader').style.display = "block";
+  document.getElementById('drop_text').style.display = 'none';
+  document.getElementById('pdf-loader').style.display = 'block';
 
   files = evt.dataTransfer.files; // FileList object.
 
@@ -81,6 +82,7 @@ function handleFileSelect(evt) {
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
 }
 
+// 画像ファイルのサムネイル表示
 function showIMGthumbnail(fr, file) {
   var img = document.createElement('img');
   var canvas = createThumbnailCanvas();
@@ -90,6 +92,7 @@ function showIMGthumbnail(fr, file) {
     this.tmpImg.src = this.result;
     this.tmpImg.onload = function () {
       document.getElementById('pdf-loader').style.display = "none";
+      document.getElementById('start-show').style.display = "block";
       canvasCtx.drawImage(this, 0, 0, canvas.width, canvas.height);
       drawFineName(canvasCtx, file.name);
       // document.getElementById('drop_zone').appendChild(this);
@@ -224,6 +227,7 @@ function showPDF(pdfUrl) {
   });
 }
 
+// pdfファイルのサムネイル表示
 function showPDFthumbnail () {
   // currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   let canvas = createThumbnailCanvas();
@@ -245,6 +249,7 @@ function showPDFthumbnail () {
     };
 
     document.getElementById('pdf-loader').style.display = "none";
+    document.getElementById('start-show').style.display = "block";
     // Render the page contents in the canvas
     page.render(renderContext).then(function () {
       drawFineName(canvasCtx, fileNames[currentMaterialIndex]);
