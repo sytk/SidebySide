@@ -52,6 +52,7 @@ window.onload = () => {
     .catch((err) => {
       console.log(err.name + ": " + err.message);
     });
+
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
     main();
@@ -455,11 +456,12 @@ async function main() {
   const fps_ctx = fps_canvas.getContext('2d');
 
   fps_ctx.font = '20pt Arial';
-  canvas.width = 1280;
-  canvas.height = 720;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
   handTracking();
 
   async function handTracking() {
+  
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
