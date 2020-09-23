@@ -2,7 +2,6 @@
 <html>
 
 <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <script src="pdf.js"></script>
   <script src="pdf.worker.js"></script>
@@ -41,19 +40,14 @@
       <button id="pdf-show" disabled>Show</button>
       <button id="pdf-delete" disabled>Delete</button>
     </div>
-    <!-- <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div> -->
   </div>
 
   <!-- モーダルウィンドウ -->
   <div id="modal" class="modal">
     <div class="modal-content" id="drop_zone">
       <div class="modal-body">
-        <!-- <p>upload here!</p> -->
         <output id="list"></output>
         <form id="my_form" enctype=multipart/form-data>
-            <!-- <input type="file" id="input_file"style="display:inline" name="upload_file enctype=multipart/form-data">
-            <br>
-            <button type="button" id="upload_button"onclick="file_upload()">アップロード</button> -->
             <div id="drop_text">ここにファイルをドロップ</div>
             <div id="pdf-loader">Loading document ...</div>
             <button id="start-show" type="button" onclick="modalNone()">start</button>
@@ -63,7 +57,6 @@
   </div>
 
   <script src="script.js"></script>
-  <!-- <script src="myHandTracking.js"></script> -->
 
 </body>
 
