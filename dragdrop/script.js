@@ -507,7 +507,7 @@ async function main() {
       for(let i = 0; i < hand_keypoints.length; i++)
       {
         const [x,y] = hand_keypoints[i];
-        ctx.fillRect(x, y, 10,10);
+        ctx.fillRect(x-5, y-5, 10,10);
       }
       ctx.fillStyle = "rgb(255,0,0)";
       ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
