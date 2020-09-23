@@ -8,7 +8,7 @@ for(let i = 0; i < 21; i++) {
 }
 
 window.onload = () => {
-  const video  = document.querySelector("video");
+  const video  = document.querySelector("camera");
 
   /** カメラ設定 */
   const constraints = {

@@ -102,8 +102,6 @@ var dropZone = document.getElementById('drop_zone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
-let ratio = 0.75;
-
 interact('.resize-drag')
   .resizable({
     // resize from all edges and corners
@@ -403,6 +401,7 @@ async function main() {
 
   async function handTracking() {
   
+
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
