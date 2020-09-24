@@ -77,6 +77,16 @@ function handleFileSelect(evt) {
   document.getElementById('start-show').style.display = "block";
 }
 
+// フルスクリーン御実装
+document.getElementById('start-show').addEventListener("click", ()=>{
+  const element = document.getElementById('fullscreen');
+  screenfull.request(element).then(function () { console.log('Browser entered fullscreen mode'); })
+  });
+
+// フルスクリーンを解除
+function exitFullScreen() { screenfull.exit(); }
+
+
 function showIMGthumbnail(fr, file) {
   var img = document.createElement('img');
   var canvas = createThumbnailCanvas();

@@ -1,3 +1,6 @@
+html {
+  allow="fullscreen";
+}
 .resize-drag {
   /* background-color: #29e;
   color: white;
@@ -87,7 +90,6 @@ video {
   background-color: rgba(0,0,0,0.5);
   /* ぼかし */
   backdrop-filter: blur(15px);
-  /* text-align:center; */
 }
 
 .modal-content{
