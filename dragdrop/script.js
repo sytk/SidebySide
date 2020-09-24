@@ -74,7 +74,18 @@ function handleFileSelect(evt) {
     }
   }
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+  document.getElementById('start-show').style.display = "block";
 }
+
+// フルスクリーン御実装
+document.getElementById('start-show').addEventListener("click", ()=>{
+  const element = document.getElementById('fullscreen');
+  screenfull.request(element).then(function () { console.log('Browser entered fullscreen mode'); })
+  });
+
+// フルスクリーンを解除
+function exitFullScreen() { screenfull.exit(); }
+
 
 function showIMGthumbnail(fr, file) {
   var img = document.createElement('img');
@@ -101,6 +112,8 @@ function handleDragOver(evt) {
 var dropZone = document.getElementById('drop_zone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
+
+let ratio = 0.75;
 
 interact('.resize-drag')
   .resizable({
@@ -364,14 +377,20 @@ document.getElementById('pdf-next').onclick = function () {
 
 // Hide the PDF
 document.getElementById('pdf-hide').onclick = function () {
-  document.getElementById('pdf-canvas').hide();
+  //document.getElementById('pdf-canvas').hide();
+  document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "hidden";
 }
 
 // Show the PDF
 document.getElementById('pdf-show').onclick = function () {
-  document.getElementById('pdf-canvas').show();
+  //document.getElementById('pdf-canvas').show();
+  //document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "visible";
+  let canvases = document.getElementsByClassName('resize-drag');
+  for (let i = 0; i < canvases.length; i++) {
+    document.getElementsByClassName('resize-drag')[i].style.visibility = "visible";
+  }
 }
-
+// Delete the PDF
 document.getElementById('pdf-delete').onclick = function() {
   let canvases = document.getElementsByClassName('resize-drag');
   document.body.removeChild(canvases[currentMaterialIndex]);
@@ -400,7 +419,6 @@ async function main() {
   handTracking();
 
   async function handTracking() {
-  
 
     ctx.fillStyle = "rgb(0, 0, 255)";
 
