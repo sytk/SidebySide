@@ -8,7 +8,7 @@ for(let i = 0; i < 21; i++) {
 }
 
 window.onload = () => {
-  const video  = document.querySelector("camera");
+  const video  = document.querySelector("video");
 
   /** カメラ設定 */
   const constraints = {
@@ -34,19 +34,21 @@ window.onload = () => {
     console.log(err.name + ": " + err.message);
   });
 
-  // run();
+  run();
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
     // load_model();
-    setInterval(track, 200);
+    // setInterval(track, 200);
+    setInterval(run, 200);
   });
 };
 
 async function run(){
   if(gesture_model == null)
   {
-    tf.loadModel('./model/model.json').then(handleModel).catch(handleError);
+    // tf.loadModel('./model/model.json').then(handleModel).catch(handleError);
+    tf.loadLayersModel('./model/model.json').then(handleModel).catch(handleError);
     function handleModel(model) {
         gesture_model = model
     }
@@ -54,7 +56,21 @@ async function run(){
         console.log(error);
     }
   }
-
+  else
+  {
+    var data = new Float32Array(42).fill(0);
+    var inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
+    var outputs = gesture_model.predict(inputs);
+    outputs.data().then(handleData).catch(handleError);
+    function handleData(data)
+    {
+      console.log(data)
+    }
+    function handleError(error)
+    {
+      console.log(error)
+    }
+  }
 }
 
 async function track()

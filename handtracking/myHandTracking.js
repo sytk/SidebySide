@@ -41,7 +41,7 @@ window.onload = () => {
 async function main() {
   // Load the MediaPipe handpose model assets.
   const landmark_model = await handpose.load();
-  // const gesture_model = tf.loadModel('./model/model.json');
+  const gesture_model = await tf.loadLayersModel('./model/model.json');
 
   const video = document.querySelector("video");
   const canvas = document.getElementById('mask');
@@ -84,9 +84,26 @@ async function main() {
     else
       gesture = 0;
 
-
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText(fps, 20, 70);
+
+    let data = new Float32Array(42);
+    data = hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
+
+    let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
+    let outputs = gesture_model.predict(inputs);
+    console.log(await outputs.data())
+
+    // console.log(outputs.data())
+    //
+    // outputs.data().then(handleData).catch(handleError);
+    // function handleData(data) { // Float32Arrayを受け取る
+    //   console.log(data)
+    // }
+    // function handleError(error){
+    //   console.log(error)
+    // }
+
     requestAnimationFrame(handTracking);
   };
   function drawHand()
@@ -121,13 +138,11 @@ async function main() {
       ctx.stroke() ;
     }
   }
+  $("#button").on('click', function() {
+  });
 }
 
 
-// $("#button").on('click', function() {
-//     // $("#file-to-upload").trigger('click');
-//     setInterval(track, 200);
-// });
 
 /*
 `predictions` is an array of objects describing each detected hand, for example:
