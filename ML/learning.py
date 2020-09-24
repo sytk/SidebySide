@@ -13,6 +13,7 @@ model = keras.Sequential([
     # keras.layers.Flatten(input_shape=(28, 28)),
     keras.layers.Input(42),
     keras.layers.Dense(128, activation='relu'),
+    # keras.layers.Dense(64, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
 #
@@ -31,8 +32,8 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 model.fit(X_train,
-             Y_train,
-            epochs=100,
+            Y_train,
+            epochs=500,
             batch_size=128,
             validation_data=(X_test, Y_test),
             verbose=2)

@@ -552,7 +552,8 @@
                             nextBoundingBox = this.getBoxForHandLandmarks(coords);
                             this.updateRegionsOfInterest(nextBoundingBox, false /* force replace */);
                             result = {
-                                landmarks: rawCoords,
+                                landmarks: coords,
+                                rawLandmarks: rawCoords,
                                 handInViewConfidence: flagValue,
                                 boundingBox: {
                                     topLeft: nextBoundingBox.startPoint,
@@ -694,10 +695,13 @@
             [input.height, input.width];
     }
     function flipHandHorizontal(prediction, width) {
-        var handInViewConfidence = prediction.handInViewConfidence, landmarks = prediction.landmarks, boundingBox = prediction.boundingBox;
+        var handInViewConfidence = prediction.handInViewConfidence, landmarks = prediction.landmarks, boundingBox = prediction.boundingBox, rawLandmarks = prediction.rawLandmarks;
         return {
             handInViewConfidence: handInViewConfidence,
             landmarks: landmarks.map(function (coord) {
+                return [width - 1 - coord[0], coord[1], coord[2]];
+            }),
+            rawLandmarks: rawLandmarks.map(function (coord) {
                 return [width - 1 - coord[0], coord[1], coord[2]];
             }),
             boundingBox: {
@@ -758,6 +762,7 @@
                                         handInViewConfidence: prediction.handInViewConfidence,
                                         boundingBox: prediction.boundingBox,
                                         landmarks: prediction.landmarks,
+                                        rawLandmarks: prediction.rawLandmarks,
                                         annotations: annotations
                                     }]];
                     }

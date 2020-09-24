@@ -1,8 +1,10 @@
 let parm_pos = new Array(2);
 let gesture;
 let hand_keypoints = new Array(21);
+let raw_hand_keypoints = new Array(21);
 for(let i = 0; i < 21; i++) {
   hand_keypoints[i] = new Array(2).fill(0);
+  raw_hand_keypoints[i] = new Array(2).fill(0);
 }
 
 window.onload = () => {
@@ -18,9 +20,7 @@ window.onload = () => {
       // facingMode: { exact: "environment" }  // リアカメラを利用する場合
     }
   };
-  /**
-   * カメラを<video>と同期
-   */
+  // カメラを<video>と同期
   navigator.mediaDevices.getUserMedia(constraints)
   .then( (stream) => {
     video.srcObject = stream;
@@ -39,7 +39,6 @@ window.onload = () => {
 };
 
 async function main() {
-  // Load the MediaPipe handpose model assets.
   const landmark_model = await handpose.load();
   const gesture_model = await tf.loadLayersModel('./model/model.json');
 
@@ -67,10 +66,14 @@ async function main() {
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
         const keypoints = predictions[i].landmarks;
+        const raw_keypoints = predictions[i].rawLandmarks;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
+          const[raw_x, raw_y, raw_z] = raw_keypoints[i];
           hand_keypoints[i][0] = x;
           hand_keypoints[i][1] = y;
+          raw_hand_keypoints[i][0] = raw_x;
+          raw_hand_keypoints[i][1] = raw_y;
         }
       }
     }
@@ -84,28 +87,33 @@ async function main() {
     else
       gesture = 0;
 
-    const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText(fps, 20, 70);
 
     let data = new Float32Array(42);
-    data = hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
+    data = raw_hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
 
     let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
-    console.log(await outputs.data())
-
-    // console.log(outputs.data())
-    //
-    // outputs.data().then(handleData).catch(handleError);
-    // function handleData(data) { // Float32Arrayを受け取る
-    //   console.log(data)
-    // }
-    // function handleError(error){
-    //   console.log(error)
-    // }
+    let predict =  maxIndex(await outputs.data());
+    // console.log(predict)
+    const fps = 1000 / (performance.now() - start);
+    fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 70);
+    fps_ctx.fillText("Gesture:"+predict, 20, 100);
 
     requestAnimationFrame(handTracking);
   };
+
+  function maxIndex(a) {
+  	let index = 0
+  	let value = -Infinity
+  	for (let i = 0, l = a.length; i < l; i++) {
+  		if (value < a[i]) {
+  			value = a[i]
+  			index = i
+  		}
+  	}
+  	return index
+  }
+
   function drawHand()
   {
     const connections = [
