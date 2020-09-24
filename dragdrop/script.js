@@ -112,8 +112,8 @@ interact('.resize-drag')
     listeners: {
       move(event) {
         let target = event.target
-        let x = (parseFloat(target.getAttribute('data-x')) || 0)
-        let y = (parseFloat(target.getAttribute('data-y')) || 0)
+        let x = target.getBoundingClientRect().left + window.pageXOffset;
+        let y = target.getBoundingClientRect().top + window.pageYOffset;
 
         // update the element's style
         let ratio = target.height / target.width;
@@ -129,11 +129,8 @@ interact('.resize-drag')
         x += event.deltaRect.left
         y += event.deltaRect.top
 
-        target.style.webkitTransform = target.style.transform =
-          'translate(' + x + 'px,' + y + 'px)'
-
-        target.setAttribute('data-x', x)
-        target.setAttribute('data-y', y)
+        target.style.left = x + 'px';
+        target.style.top = y + 'px';
         target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
       }
     },
@@ -165,17 +162,10 @@ interact('.resize-drag')
 function dragMoveListener(event) {
   let target = event.target
   // keep the dragged position in the data-x/data-y attributes
-  let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-  let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-  // translate the element
-  target.style.webkitTransform =
-    target.style.transform =
-    'translate(' + x + 'px, ' + y + 'px)'
-
-  // update the posiion attributes
-  target.setAttribute('data-x', x)
-  target.setAttribute('data-y', y)
+  let x = target.getBoundingClientRect().left + window.pageXOffset + event.dx;
+  let y = target.getBoundingClientRect().top + window.pageYOffset + event.dy;
+  target.style.left = x + 'px';
+  target.style.top = y + 'px';
 }
 
 // this function is used later in the resizing and gesture demos
