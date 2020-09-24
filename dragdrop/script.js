@@ -74,6 +74,7 @@ function handleFileSelect(evt) {
     }
   }
   document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+  document.getElementById('start-show').style.display = "block";
 }
 
 function showIMGthumbnail(fr, file) {
@@ -402,7 +403,7 @@ async function main() {
   handTracking();
 
   async function handTracking() {
-  
+
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
