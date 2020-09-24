@@ -1,3 +1,4 @@
+let prevParmPos = new Array(2);
 let parm_pos = new Array(2);
 let gesture;
 let hand_keypoints = new Array(21);
@@ -102,8 +103,6 @@ var dropZone = document.getElementById('drop_zone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
-let ratio = 0.75;
-
 interact('.resize-drag')
   .resizable({
     // resize from all edges and corners
@@ -175,7 +174,7 @@ function showPDF(pdfUrl) {
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   let canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  canvas.width = 400;
+  // canvas.width = 400;
   canvas.dataset.materialIndex = currentMaterialIndex;
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
@@ -287,7 +286,6 @@ function showPage(pageNo) {
 function showImage(imgUrl) {
   const canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  canvas.width = 400;
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   canvas.dataset.materialIndex = currentMaterialIndex;
 
@@ -346,6 +344,7 @@ document.getElementById('pdf-prev').onclick = function () {
 
 // Next page of the PDF
 document.getElementById('pdf-next').onclick = function () {
+  console.log('pdf-next called.');
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
     currentPage = parseInt(material.dataset.page),
     numPages = parseInt(material.dataset.numPages);
@@ -412,6 +411,7 @@ async function main() {
       }
     }
     for(let i = 0; i < 2; i++){
+      prevParmPos[i] = parm_pos[i];
       parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
     }
 
@@ -425,6 +425,25 @@ async function main() {
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText(fps, 20, 70);
     requestAnimationFrame(handTracking);
+
+    let element = document.elementFromPoint(canvas.width - parm_pos[0], parm_pos[1]);
+    if (element !== undefined) {
+      if (element.tagName === 'CANVAS') {
+        Array.prototype.forEach.call(document.getElementsByClassName('resize-drag'), function (material) {
+          if (element === material) {
+            console.log('material');
+            if (gesture === 5) {
+              let x = material.getBoundingClientRect().left + window.pageXOffset + (prevParmPos[0] - parm_pos[0]);
+              let y = material.getBoundingClientRect().top + window.pageYOffset + (parm_pos[1] - prevParmPos[1]);
+              material.style.left = x + 'px';
+              material.style.top = y + 'px';
+            } else if (gesture === 0) {
+              // document.getElementById('pdf-next').click();
+            }
+          }
+        });
+      }
+    }
   };
   function drawHand()
   {
