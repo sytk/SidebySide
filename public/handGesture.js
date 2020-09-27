@@ -37,6 +37,8 @@ async function HG() {
       for (let i = 0; i < predictions.length; i++) {
         const keypoints = predictions[i].landmarks;
         const raw_keypoints = predictions[i].rawLandmarks;
+        if (raw_keypoints[17][0] > raw_keypoints[5][0])
+          break;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
           const[raw_x, raw_y, raw_z] = raw_keypoints[i];
