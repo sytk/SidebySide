@@ -11,33 +11,32 @@ async function HG() {
   const gesture_model = await tf.loadLayersModel('./model/model.json');
 
   const video = document.getElementById('camera');
-  const canvas = document.getElementById('mask');
-  const ctx = canvas.getContext('2d');
+  const mask_canvas = document.getElementById('mask');
+  const mask_ctx = mask_canvas.getContext('2d');
 
   const fps_canvas = document.getElementById('fps');
   const fps_ctx = fps_canvas.getContext('2d');
 
   fps_ctx.font = '20pt Arial';
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  mask_canvas.width = video.videoWidth;
+  mask_canvas.height = video.videoHeight;
 
   handTracking();
 
   async function handTracking() {
 
-    ctx.fillStyle = "rgb(0, 0, 255)";
+    mask_ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
     const predictions = await landmark_model.estimateHands(video);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
     fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
 
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
         const keypoints = predictions[i].landmarks;
         const raw_keypoints = predictions[i].rawLandmarks;
-        var bb = predictions[i].boundingBox;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
           const[raw_x, raw_y, raw_z] = raw_keypoints[i];
@@ -48,16 +47,18 @@ async function HG() {
         }
       }
     }
-    for(let i = 0; i < 2; i++){
-      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
-    }
+
+    for(let i = 0; i < 2; i++)
+      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
+
+    parm_depth = calcDepth(hand_keypoints[5], hand_keypoints[17]);
 
     drawHand();
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 50);
     fps_ctx.fillText("Gesture:"+gesture, 20, 80);
-    // fps_ctx.fillText(, 20, 110);
-    console.log(bb)
+    fps_ctx.fillText(parm_depth, 20, 110);
+
     let data = new Float32Array(42);
     data = raw_hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
     let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
@@ -65,7 +66,7 @@ async function HG() {
     let predict = await outputs.data();
     gesture =  maxIndex(predict);
     if(gesture==1)
-      gesture =0
+      gesture = 0;
 
     requestAnimationFrame(handTracking);
 
@@ -109,27 +110,39 @@ async function HG() {
         [17, 18], [18, 19], [19, 20],
         [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
     ]
-    if (canvas.getContext) {
+    if (mask_canvas.getContext) {
       for(let i = 0; i < hand_keypoints.length; i++)
       {
         const [x,y] = hand_keypoints[i];
-        ctx.fillRect(x-5, y-5, 10,10);
+        mask_ctx.fillRect(x-5, y-5, 10,10);
       }
-      ctx.fillStyle = "rgb(255,0,0)";
-      ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+      mask_ctx.fillStyle = "rgb(255,0,0)";
+      mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
 
-      ctx.beginPath() ;
+      mask_ctx.beginPath() ;
       for(let i = 0; i < connections.length; i++)
       {
         const s = connections[i][0]
         const t = connections[i][1]
-        ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
-        ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+        mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
+        mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
       }
-      ctx.strokeStyle = "rgb(0,255,0)";
-      ctx.lineWidth = 3 ;
-      ctx.stroke() ;
+      mask_ctx.strokeStyle = "rgb(0,255,0)";
+      mask_ctx.lineWidth = 3 ;
+      mask_ctx.stroke() ;
     }
+  }
+  function calcDepth(a,b)
+  {
+    if(a.length != b.length)
+      return null;
+    let val = 0;
+    for(let i = 0; i < 2; i++)
+    {
+      val += Math.pow(b[i] - a[i], 2);
+    }
+    // return Math.sqrt(val);
+    return val;
   }
 }
 
