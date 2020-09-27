@@ -123,8 +123,8 @@ interact('.resize-drag')
     listeners: {
       move(event) {
         let target = event.target
-        let x = (parseFloat(target.getAttribute('data-x')) || 0)
-        let y = (parseFloat(target.getAttribute('data-y')) || 0)
+        let x = target.getBoundingClientRect().left + window.pageXOffset;
+        let y = target.getBoundingClientRect().top + window.pageYOffset;
 
         // update the element's style
         let ratio = target.height / target.width;
@@ -140,11 +140,8 @@ interact('.resize-drag')
         x += event.deltaRect.left
         y += event.deltaRect.top
 
-        target.style.webkitTransform = target.style.transform =
-          'translate(' + x + 'px,' + y + 'px)'
-
-        target.setAttribute('data-x', x)
-        target.setAttribute('data-y', y)
+        target.style.left = x + 'px';
+        target.style.top = y + 'px';
         target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
       }
     },
@@ -176,17 +173,10 @@ interact('.resize-drag')
 function dragMoveListener(event) {
   let target = event.target
   // keep the dragged position in the data-x/data-y attributes
-  let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-  let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
-
-  // translate the element
-  target.style.webkitTransform =
-    target.style.transform =
-    'translate(' + x + 'px, ' + y + 'px)'
-
-  // update the posiion attributes
-  target.setAttribute('data-x', x)
-  target.setAttribute('data-y', y)
+  let x = target.getBoundingClientRect().left + window.pageXOffset + event.dx;
+  let y = target.getBoundingClientRect().top + window.pageYOffset + event.dy;
+  target.style.left = x + 'px';
+  target.style.top = y + 'px';
 }
 
 // this function is used later in the resizing and gesture demos
@@ -196,7 +186,7 @@ function showPDF(pdfUrl) {
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   let canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  canvas.width = 400;
+  // canvas.width = 400;
   canvas.dataset.materialIndex = currentMaterialIndex;
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
@@ -308,7 +298,6 @@ function showPage(pageNo) {
 function showImage(imgUrl) {
   const canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  canvas.width = 400;
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   canvas.dataset.materialIndex = currentMaterialIndex;
 
@@ -367,6 +356,7 @@ document.getElementById('pdf-prev').onclick = function () {
 
 // Next page of the PDF
 document.getElementById('pdf-next').onclick = function () {
+  console.log('pdf-next called.');
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
     currentPage = parseInt(material.dataset.page),
     numPages = parseInt(material.dataset.numPages);
@@ -422,6 +412,7 @@ async function HG() {
   handTracking();
 
   async function handTracking() {
+
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
@@ -462,6 +453,24 @@ async function HG() {
     if(gesture==1)
       gesture =0
     requestAnimationFrame(handTracking);
+    
+    video.videoWidth
+    
+    document.documentElement.clientWidth;
+    document.documentElement.clientHeight;
+
+    let ratio =document.documentElement.clientWidth / video.videoWidth;
+    let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
+    let y = parm_pos[1] * ratio;
+    let element = document.elementFromPoint(x, y);
+    if (element.className === 'resize-drag') {
+      if (gesture === 5) {
+        element.style.left = x - parseFloat(element.width) / 2 + 'px';
+        element.style.top = y - parseFloat(element.height) / 2 + 'px';
+      } else if (gesture === 0) {
+        // document.getElementById('pdf-next').click();
+      }
+    }
   };
   function maxIndex(a) {
     let index = 0
