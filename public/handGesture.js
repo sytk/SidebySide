@@ -17,11 +17,10 @@ async function HG() {
   const fps_canvas = document.getElementById('fps');
   const fps_ctx = fps_canvas.getContext('2d');
 
-  fps_ctx.font = '40pt Arial';
+  fps_ctx.font = '20pt Arial';
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  fps_canvas.width = 240;
-  fps_canvas.height = 120;
+
   handTracking();
 
   async function handTracking() {
@@ -38,6 +37,7 @@ async function HG() {
       for (let i = 0; i < predictions.length; i++) {
         const keypoints = predictions[i].landmarks;
         const raw_keypoints = predictions[i].rawLandmarks;
+        var bb = predictions[i].boundingBox;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
           const[raw_x, raw_y, raw_z] = raw_keypoints[i];
@@ -54,9 +54,10 @@ async function HG() {
 
     drawHand();
     const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 70);
-    fps_ctx.fillText("Gesture:"+gesture, 20, 100);
-
+    fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 50);
+    fps_ctx.fillText("Gesture:"+gesture, 20, 80);
+    // fps_ctx.fillText(, 20, 110);
+    console.log(bb)
     let data = new Float32Array(42);
     data = raw_hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
     let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
@@ -131,3 +132,42 @@ async function HG() {
     }
   }
 }
+
+/*
+`predictions` is an array of objects describing each detected hand, for example:
+[
+  {
+    handInViewConfidence: 1, // The probability of a hand being present.
+    boundingBox: { // The bounding box surrounding the hand.
+      topLeft: [162.91, -17.42],
+      bottomRight: [548.56, 368.23],
+    },
+    landmarks: [ // The 3D coordinates of each hand landmark.
+      [472.52, 298.59, 0.00],
+      [412.80, 315.64, -6.18],
+      ...
+    ],
+    annotations: { // Semantic groupings of the `landmarks` coordinates.
+      thumb: [
+        [412.80, 315.64, -6.18]
+        [350.02, 298.38, -7.14],
+        ...
+      ],
+      ...
+    }
+  }
+]
+*/
+
+// #        8   12  16  20
+// #        |   |   |   |
+// #        7   11  15  19
+// #    4   |   |   |   |
+// #    |   6   10  14  18
+// #    3   |   |   |   |
+// #    |   5---9---13--17
+// #    2    \         /
+// #     \    \       /
+// #      1    \     /
+// #       \    \   /
+// #        ------0-

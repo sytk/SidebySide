@@ -1,4 +1,5 @@
 let parm_pos = new Array(2);
+let parm_depth;
 let gesture;
 
 const video = document.getElementById("camera");
