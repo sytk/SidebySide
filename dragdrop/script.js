@@ -1,4 +1,3 @@
-let prevParmPos = new Array(2);
 let parm_pos = new Array(2);
 let gesture;
 let hand_keypoints = new Array(21);
@@ -411,7 +410,6 @@ async function main() {
       }
     }
     for(let i = 0; i < 2; i++){
-      prevParmPos[i] = parm_pos[i];
       parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
     }
 
@@ -425,23 +423,20 @@ async function main() {
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText(fps, 20, 70);
     requestAnimationFrame(handTracking);
-
-    let element = document.elementFromPoint(canvas.width - parm_pos[0], parm_pos[1]);
-    if (element !== undefined) {
-      if (element.tagName === 'CANVAS') {
-        Array.prototype.forEach.call(document.getElementsByClassName('resize-drag'), function (material) {
-          if (element === material) {
-            console.log('material');
-            if (gesture === 5) {
-              let x = material.getBoundingClientRect().left + window.pageXOffset + (prevParmPos[0] - parm_pos[0]);
-              let y = material.getBoundingClientRect().top + window.pageYOffset + (parm_pos[1] - prevParmPos[1]);
-              material.style.left = x + 'px';
-              material.style.top = y + 'px';
-            } else if (gesture === 0) {
-              // document.getElementById('pdf-next').click();
-            }
-          }
-        });
+    
+    video.videoWidth
+    
+    let ratio = canvas.width / video.videoWidth;
+    let x = canvas.width - parm_pos[0] * ratio;
+    let y = parm_pos[1] * ratio;
+    let element = document.elementFromPoint(x, y);
+    if (element.className === 'resize-drag') {
+      console.log('material');
+      if (gesture === 5) {
+        element.style.left = x + 'px';
+        element.style.top = y + 'px';
+      } else if (gesture === 0) {
+        // document.getElementById('pdf-next').click();
       }
     }
   };
