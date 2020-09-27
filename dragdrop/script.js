@@ -39,7 +39,7 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    main();
+    HG();
   });
 };
 
@@ -402,7 +402,7 @@ document.getElementById('pdf-delete').onclick = function() {
   currentMaterialIndex = 0;
 }
 
-async function main() {
+async function HG() {
   // Load the MediaPipe handpose model assets.
   const landmark_model = await handpose.load();
 
