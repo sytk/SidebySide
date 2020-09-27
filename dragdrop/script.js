@@ -448,7 +448,7 @@ async function HG() {
       parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3
     }
 
-    drawHand()
+    drawHand();
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 70);
     fps_ctx.fillText("Gesture:"+gesture, 20, 100);
@@ -459,7 +459,8 @@ async function HG() {
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
     gesture =  maxIndex(predict);
-
+    if(gesture==1)
+      gesture =0
     requestAnimationFrame(handTracking);
   };
   function maxIndex(a) {
