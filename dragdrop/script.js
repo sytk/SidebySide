@@ -1,8 +1,10 @@
 let parm_pos = new Array(2);
 let gesture;
 let hand_keypoints = new Array(21);
+let raw_hand_keypoints = new Array(21);
 for(let i = 0; i < 21; i++) {
   hand_keypoints[i] = new Array(2).fill(0);
+  raw_hand_keypoints[i] = new Array(2).fill(0);
 }
 
 const video = document.getElementById("camera");
@@ -112,8 +114,6 @@ function handleDragOver(evt) {
 var dropZone = document.getElementById('drop_zone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
-
-let ratio = 0.75;
 
 interact('.resize-drag')
   .resizable({
@@ -405,6 +405,7 @@ document.getElementById('pdf-delete').onclick = function() {
 async function HG() {
   // Load the MediaPipe handpose model assets.
   const landmark_model = await handpose.load();
+  const gesture_model = await tf.loadLayersModel('./model/model.json');
 
   const video = document.getElementById('camera');
   const canvas = document.getElementById('mask');
@@ -413,13 +414,14 @@ async function HG() {
   const fps_canvas = document.getElementById('fps');
   const fps_ctx = fps_canvas.getContext('2d');
 
-  fps_ctx.font = '20pt Arial';
+  fps_ctx.font = '40pt Arial';
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
+  fps_canvas.width = 240;
+  fps_canvas.height = 120;
   handTracking();
 
   async function handTracking() {
-
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
@@ -431,10 +433,14 @@ async function HG() {
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
         const keypoints = predictions[i].landmarks;
+        const raw_keypoints = predictions[i].rawLandmarks;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
+          const[raw_x, raw_y, raw_z] = raw_keypoints[i];
           hand_keypoints[i][0] = x;
           hand_keypoints[i][1] = y;
+          raw_hand_keypoints[i][0] = raw_x;
+          raw_hand_keypoints[i][1] = raw_y;
         }
       }
     }
@@ -443,16 +449,31 @@ async function HG() {
     }
 
     drawHand()
-    if(hand_keypoints[16][1] < hand_keypoints[13][1])
-      gesture = 5;
-    else
-      gesture = 0;
-
-
     const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText(fps, 20, 70);
+    fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 70);
+    fps_ctx.fillText("Gesture:"+gesture, 20, 100);
+
+    let data = new Float32Array(42);
+    data = raw_hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
+    let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
+    let outputs = gesture_model.predict(inputs);
+    let predict = await outputs.data();
+    gesture =  maxIndex(predict);
+
     requestAnimationFrame(handTracking);
   };
+  function maxIndex(a) {
+    let index = 0
+    let value = -Infinity
+    for (let i = 0, l = a.length; i < l; i++) {
+      if (value < a[i]) {
+        value = a[i]
+        index = i
+      }
+    }
+    return index
+  };
+
   function drawHand()
   {
     const connections = [
