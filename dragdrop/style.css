@@ -1,6 +1,3 @@
-html {
-  allow="fullscreen";
-}
 .resize-drag {
   /* background-color: #29e;
   color: white;
@@ -116,7 +113,7 @@ video {
 }
 
 #start-show {
-  display: none;
+  /* display: none; */
   width: 140px;
   height: 45px;
   font-family: 'Roboto', sans-serif;
