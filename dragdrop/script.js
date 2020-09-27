@@ -452,26 +452,23 @@ async function HG() {
     gesture =  maxIndex(predict);
     if(gesture==1)
       gesture =0
-    requestAnimationFrame(handTracking);
-    
-    video.videoWidth
-    
-    document.documentElement.clientWidth;
-    document.documentElement.clientHeight;
 
-    let ratio =document.documentElement.clientWidth / video.videoWidth;
+    requestAnimationFrame(handTracking);
+
+    let ratio = document.documentElement.clientWidth / video.videoWidth;
     let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
     let y = parm_pos[1] * ratio;
     let element = document.elementFromPoint(x, y);
     if (element.className === 'resize-drag') {
       if (gesture === 5) {
-        element.style.left = x - parseFloat(element.width) / 2 + 'px';
-        element.style.top = y - parseFloat(element.height) / 2 + 'px';
+        element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
+        element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
       } else if (gesture === 0) {
         // document.getElementById('pdf-next').click();
       }
     }
   };
+
   function maxIndex(a) {
     let index = 0
     let value = -Infinity
