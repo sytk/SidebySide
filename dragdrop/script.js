@@ -311,7 +311,7 @@ function showImage(imgUrl) {
 // Upon click this should should trigger click on the #file-to-upload file input element
 // This is better than showing the not-good-looking file input element
 document.getElementById('upload-button').onclick = function () {
-  document.getElementById('file-to-upload').trigger('click');
+  document.getElementById('file-to-upload').click();
 }
 
 // When user chooses a PDF file
@@ -391,7 +391,7 @@ async function main() {
   handTracking();
 
   async function handTracking() {
-  
+
     ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
