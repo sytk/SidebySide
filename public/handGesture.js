@@ -85,6 +85,17 @@ async function HG() {
         } else if (gesture === 3 && prevGesture !== 3) {
           document.getElementById('pdf-next').click();
         } else if (gesture === 5) {
+          let scale = element.dataset.scale;
+          if (prevGesture !== 5) {
+            // baseDepth = parm_depth / scale;
+            baseDepth = parm_depth / 1;
+          }
+          scale = parm_depth / baseDepth;
+          element.dataset.scale = scale;
+          element.style.width = element.width * scale + 'px'
+          element.style.height = element.height * scale + 'px'
+
+          element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
           element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
           element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
         } else if (gesture === 0) {

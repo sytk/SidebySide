@@ -1,5 +1,6 @@
 let parm_pos = new Array(2);
 let parm_depth;
+let baseDepth;
 let gesture;
 let prevGesture;
 
@@ -123,7 +124,13 @@ interact('.resize-drag')
         let y = target.getBoundingClientRect().top + window.pageYOffset;
 
         // update the element's style
-        let ratio = target.height / target.width;
+        let ratio, scale;
+        if (target.hasAttribute('data-ratio')) {
+          ratio = target.dataset.ratio;
+        } else {
+          ratio = target.height / target.width;
+          target.dataset.ratio = ratio;
+        }
         if (Math.abs(event.deltaRect.left) < Math.abs(event.deltaRect.top)) {
           target.style.width = event.rect.height / ratio + 'px'
           target.style.height = event.rect.height + 'px'
@@ -136,8 +143,9 @@ interact('.resize-drag')
         x += event.deltaRect.left
         y += event.deltaRect.top
 
+        // target.dataset.scale = parseFloat(target.style.height) / target.height;
         target.style.left = x + 'px';
-        target.style.top = y + 'px';
+        target.style.top = y + 'px'
         target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
       }
     },
@@ -258,6 +266,7 @@ function showPage(pageNo) {
     canvasCtx = canvas.getContext('2d');
 
     canvas.dataset.page = pageNo;
+    canvas.dataset.scale = 1.0;
 
   // Disable Prev & Next buttons while page is being loaded
   if (canvas.dataset.page === '1') {
@@ -280,6 +289,7 @@ function showPage(pageNo) {
 
     // Set canvas height
     canvas.height = viewport.height;
+    canvas.dataset.scale = scaleRequired;
 
     let renderContext = {
       canvasContext: canvasCtx,
@@ -301,10 +311,11 @@ function showImage(imgUrl) {
   const img = new Image();
   img.src = imgUrl;
   img.onload = () => {
-    canvas.height = img.height = img.height * (canvas.width / img.width);
+    materials.push(img);
+    canvas.dataset.scale = canvas.width / img.width;
+    canvas.height = img.height = img.height * canvas.dataset.scale;
     canvasCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
   }
-  materials.push(img);
 
   canvas.dataset.page = 1;
   canvas.dataset.numPages = 1;
