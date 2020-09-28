@@ -77,11 +77,12 @@ async function HG() {
     let y = parm_pos[1] * ratio;
     let element = document.elementFromPoint(x, y);
 
+
     if(element != null){
       if(element.className === 'resize-drag') {
         if (gesture === 5) {
-          element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
-          element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
+          element.style.left = x - parseFloat(element.width) / 2 + 'px';
+          element.style.top = y - parseFloat(element.height) / 2 + 'px';
         } else if (gesture === 0) {
           // document.getElementById('pdf-next').click();
         }
