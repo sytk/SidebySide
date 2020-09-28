@@ -85,10 +85,10 @@ async function HG() {
         } else if (gesture === 3 && prevGesture !== 3) {
           document.getElementById('pdf-next').click();
         } else if (gesture === 5) {
-          let scale = element.dataset.scale;
+          // TODO : falseのとき1渡してるの後で絶対バグると思う
+          let scale = (element.hasAttribute('data-scale') ? element.dataset.scale : 1);
           if (prevGesture !== 5) {
-            // baseDepth = parm_depth / scale;
-            baseDepth = parm_depth / 1;
+            baseDepth = parm_depth / scale;
           }
           scale = parm_depth / baseDepth;
           element.dataset.scale = scale;

@@ -124,7 +124,7 @@ interact('.resize-drag')
         let y = target.getBoundingClientRect().top + window.pageYOffset;
 
         // update the element's style
-        let ratio, scale;
+        let ratio;
         if (target.hasAttribute('data-ratio')) {
           ratio = target.dataset.ratio;
         } else {
@@ -146,6 +146,7 @@ interact('.resize-drag')
         // target.dataset.scale = parseFloat(target.style.height) / target.height;
         target.style.left = x + 'px';
         target.style.top = y + 'px'
+        target.dataset.scale = parseFloat(target.style.width) / target.width;
         target.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height)
       }
     },
@@ -289,7 +290,6 @@ function showPage(pageNo) {
 
     // Set canvas height
     canvas.height = viewport.height;
-    canvas.dataset.scale = scaleRequired;
 
     let renderContext = {
       canvasContext: canvasCtx,
@@ -312,8 +312,7 @@ function showImage(imgUrl) {
   img.src = imgUrl;
   img.onload = () => {
     materials.push(img);
-    canvas.dataset.scale = canvas.width / img.width;
-    canvas.height = img.height = img.height * canvas.dataset.scale;
+    canvas.height = img.height = img.height * (canvas.width / img.width);
     canvasCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
   }
 
