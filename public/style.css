@@ -1,6 +1,6 @@
 .resize-drag {
   touch-action: none;
-  width: 120px;
+  /* width: 240px; */
   position: absolute;
   /* This makes things *much* easier */
   box-sizing: border-box;

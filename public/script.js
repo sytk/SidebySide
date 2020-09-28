@@ -181,8 +181,10 @@ function showPDF(pdfUrl) {
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   let canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
-  // canvas.width = 400;
   canvas.dataset.materialIndex = currentMaterialIndex;
+
+  canvas.style.top = 0 + 'px';
+  canvas.style.left = 0 + 'px';
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     materials.push(pdfDoc);
@@ -295,6 +297,9 @@ function showImage(imgUrl) {
   canvas.classList.add('resize-drag');
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   canvas.dataset.materialIndex = currentMaterialIndex;
+
+  canvas.style.top = 0 + 'px';
+  canvas.style.left = 0 + 'px';
 
   const canvasCtx = canvas.getContext('2d');
   const img = new Image();
