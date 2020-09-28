@@ -81,13 +81,22 @@ function downKey(e) {
     case 'KeyF':
       goFullScreen();
       break;
+    case 'ArrowRight':
+      nextPage();
+      break;
+    case 'ArrowLeft':
+      previousPage();
+      break;
+    case 'Backspace':
+      deletePDF();
+      break;
     default:
       break;
   }
 }
 
 document.getElementById('start-show').addEventListener("click", ()=>{ goFullScreen(); });
-// フルスクリーン御実装
+// フルスクリーンを実装
 function goFullScreen() {
   const element = document.getElementById('fullscreen');
   screenfull.request(element).then(function () { console.log('Browser entered fullscreen mode'); })
@@ -370,8 +379,9 @@ document.getElementById('file-to-upload').onchange = function () {
   }
 }
 
-// Previous page of the PDFï￥
-document.getElementById('pdf-prev').onclick = function () {
+// Previous page of the PDF
+document.getElementById('pdf-prev').addEventListener("click", ()=>{ previousPage(); });
+function previousPage() {
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
     currentPage = parseInt(material.dataset.page);
   if (currentPage !== 1) {
@@ -380,7 +390,8 @@ document.getElementById('pdf-prev').onclick = function () {
 }
 
 // Next page of the PDF
-document.getElementById('pdf-next').onclick = function () {
+document.getElementById('pdf-next').addEventListener("click", ()=>{ nextPage(); });
+function nextPage() {
   console.log('pdf-next called.');
   let material = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
     currentPage = parseInt(material.dataset.page),
@@ -406,7 +417,8 @@ document.getElementById('pdf-show').onclick = function () {
   }
 }
 // Delete the PDF
-document.getElementById('pdf-delete').onclick = function() {
+document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
+function deletePDF() {
   let canvases = document.getElementsByClassName('resize-drag');
   document.body.removeChild(canvases[currentMaterialIndex]);
 
