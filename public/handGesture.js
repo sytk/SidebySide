@@ -66,6 +66,7 @@ async function HG() {
     let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
+    prevGesture = gesture;
     gesture =  maxIndex(predict);
     if(gesture==1)
       gesture = 0;
@@ -79,7 +80,11 @@ async function HG() {
 
     if(element != null){
       if(element.className === 'resize-drag') {
-        if (gesture === 5) {
+        if (gesture === 2 && prevGesture !== 2) {
+          document.getElementById('pdf-prev').click();
+        } else if (gesture === 3 && prevGesture !== 3) {
+          document.getElementById('pdf-next').click();
+        } else if (gesture === 5) {
           element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
           element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
         } else if (gesture === 0) {
