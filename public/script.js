@@ -42,7 +42,6 @@ window.onload = () => {
 
 // モーダルウィンドウ表示
 function modalBlock() { document.getElementById('modal').style.display = 'block'; }
-
 // モーダルウィンドウ非表示
 function modalNone() { document.getElementById('modal').style.display = 'none'; }
 
@@ -75,7 +74,6 @@ function handleFileSelect(evt) {
 }
 
 document.addEventListener('keydown', downKey);
-
 function downKey(e) {
   switch(e.code) {
     case 'KeyF':
@@ -234,7 +232,8 @@ function showPDF(pdfUrl) {
     alert(error.message);
   });
 
-  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+  // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+  canvas.onclick = () => updateCurrentMaterialIndex(canvas);
 }
 function showImage(imgUrl) {
   const canvas = document.createElement("canvas");
@@ -267,7 +266,18 @@ function showImage(imgUrl) {
   document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
 
-  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+  // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+  canvas.onclick = () => updateCurrentMaterialIndex(canvas);
+}
+
+function updateCurrentMaterialIndex(canvas) {
+  console.log('update currentCanas');
+  // if (currentMaterialIndex != canvas.dataset.materialIndex) {
+    let currentCanas = document.getElementsByClassName('resize-drag')[currentMaterialIndex];
+    currentCanas.removeAttribute('id');
+    currentMaterialIndex = canvas.dataset.materialIndex;
+    canvas.setAttribute('id', 'selected');
+  // }
 }
 
 function showPDFthumbnail () {

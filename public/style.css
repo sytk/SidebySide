@@ -175,6 +175,10 @@ video {
 	box-sizing: border-box;
 }
 
+#selected {
+  border:solid 5px #999999;
+}
+
 #page-loader {
 	height: 100px;
 	line-height: 100px;
