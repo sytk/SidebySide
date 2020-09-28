@@ -74,12 +74,24 @@ function handleFileSelect(evt) {
   document.getElementById('start-show').style.display = "block";
 }
 
+document.addEventListener('keydown', downKey);
+
+function downKey(e) {
+  switch(e.code) {
+    case 'KeyF':
+      goFullScreen();
+      break;
+    default:
+      break;
+  }
+}
+
+document.getElementById('start-show').addEventListener("click", ()=>{ goFullScreen(); });
 // フルスクリーン御実装
-document.getElementById('start-show').addEventListener("click", ()=>{
+function goFullScreen() {
   const element = document.getElementById('fullscreen');
   screenfull.request(element).then(function () { console.log('Browser entered fullscreen mode'); })
-  });
-
+}
 // フルスクリーンを解除
 function exitFullScreen() { screenfull.exit(); }
 
