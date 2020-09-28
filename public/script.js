@@ -195,8 +195,14 @@ function showPDF(pdfUrl) {
   canvas.classList.add('resize-drag');
   canvas.dataset.materialIndex = currentMaterialIndex;
 
-  canvas.style.top = 0 + 'px';
-  canvas.style.left = 0 + 'px';
+  // canvas.width = 300
+  // currentMaterialElements = document.getElementsByClassName('resize-drag');
+  // let sum = 0;
+  // for(let i = 0; i < currentMaterialElements.length; i++)
+  //   sum += currentMaterialElements[i].height
+  //   console.log(sum);
+  // canvas.style.top = sum + 'px';
+  // canvas.style.left = 0 + 'px';
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     materials.push(pdfDoc);
@@ -218,6 +224,39 @@ function showPDF(pdfUrl) {
 
     alert(error.message);
   });
+
+  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
+}
+function showImage(imgUrl) {
+  const canvas = document.createElement("canvas");
+  canvas.classList.add('resize-drag');
+  currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
+  canvas.dataset.materialIndex = currentMaterialIndex;
+
+  canvas.width = 300
+  currentMaterialElements = document.getElementsByClassName('resize-drag');
+  let sum = 0;
+  for(let i = 0; i < currentMaterialElements.length; i++)
+    sum += currentMaterialElements[i].height
+    console.log(sum);
+  canvas.style.top = sum + 'px';
+  canvas.style.left = 0 + 'px';
+
+  const canvasCtx = canvas.getContext('2d');
+  const img = new Image();
+  img.src = imgUrl;
+  img.onload = () => {
+    canvas.height = img.height = img.height * (canvas.width / img.width);
+    canvasCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+  materials.push(img);
+
+  canvas.dataset.page = 1;
+  canvas.dataset.numPages = 1;
+  document.body.appendChild(canvas);
+  document.getElementById('pdf-hide').removeAttribute('disabled');
+  document.getElementById('pdf-show').removeAttribute('disabled');
+  document.getElementById('pdf-delete').removeAttribute('disabled');
 
   canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
 }
@@ -304,33 +343,7 @@ function showPage(pageNo) {
   });
 }
 
-function showImage(imgUrl) {
-  const canvas = document.createElement("canvas");
-  canvas.classList.add('resize-drag');
-  currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
-  canvas.dataset.materialIndex = currentMaterialIndex;
 
-  canvas.style.top = 0 + 'px';
-  canvas.style.left = 0 + 'px';
-
-  const canvasCtx = canvas.getContext('2d');
-  const img = new Image();
-  img.src = imgUrl;
-  img.onload = () => {
-    canvas.height = img.height = img.height * (canvas.width / img.width);
-    canvasCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  }
-  materials.push(img);
-
-  canvas.dataset.page = 1;
-  canvas.dataset.numPages = 1;
-  document.body.appendChild(canvas);
-  document.getElementById('pdf-hide').removeAttribute('disabled');
-  document.getElementById('pdf-show').removeAttribute('disabled');
-  document.getElementById('pdf-delete').removeAttribute('disabled');
-
-  canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
-}
 
 // Upon click this should should trigger click on the #file-to-upload file input element
 // This is better than showing the not-good-looking file input element
