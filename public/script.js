@@ -195,14 +195,14 @@ function showPDF(pdfUrl) {
   canvas.classList.add('resize-drag');
   canvas.dataset.materialIndex = currentMaterialIndex;
 
-  // canvas.width = 300
-  // currentMaterialElements = document.getElementsByClassName('resize-drag');
-  // let sum = 0;
-  // for(let i = 0; i < currentMaterialElements.length; i++)
-  //   sum += currentMaterialElements[i].height
-  //   console.log(sum);
-  // canvas.style.top = sum + 'px';
-  // canvas.style.left = 0 + 'px';
+  canvas.width = 300
+  currentMaterialElements = document.getElementsByClassName('resize-drag');
+  let sum = 0;
+  for(let i = 0; i < currentMaterialElements.length; i++)
+    sum += currentMaterialElements[i].height
+    console.log(sum);
+  canvas.style.top = sum + 'px';
+  canvas.style.left = 0 + 'px';
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     materials.push(pdfDoc);
