@@ -87,6 +87,9 @@ function downKey(e) {
     case 'ArrowLeft':
       previousPage();
       break;
+    case 'Backspace':
+      deletePDF();
+      break;
     default:
       break;
   }
@@ -414,7 +417,8 @@ document.getElementById('pdf-show').onclick = function () {
   }
 }
 // Delete the PDF
-document.getElementById('pdf-delete').onclick = function() {
+document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
+function deletePDF() {
   let canvases = document.getElementsByClassName('resize-drag');
   document.body.removeChild(canvases[currentMaterialIndex]);
 
