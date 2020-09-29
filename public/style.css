@@ -143,6 +143,10 @@ video {
   border:solid 5px #0000FF;
 }
 
+#grabbing {
+    border:solid 5px #00FF00;
+}
+
 #page-loader {
 	height: 100px;
 	line-height: 100px;

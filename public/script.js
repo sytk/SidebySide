@@ -375,6 +375,8 @@ function executeGestureAction() {
 
   if (element != null) {
     if (element.className === 'resize-drag') {
+      updateCurrentMaterialIndex(element);
+      element.setAttribute('id', 'grabbing');
       if (gesture === 2 && prevGesture !== 2) {
         document.getElementById('pdf-prev').click();
       } else if (gesture === 3 && prevGesture !== 3) {
@@ -382,8 +384,6 @@ function executeGestureAction() {
       } else if (gesture === 5) {
         // TODO : falseのとき1渡してるの後で絶対バグると思う
         let scale = element.hasAttribute('data-scale') ? element.dataset.scale : 1;
-        console.log(element.hasAttribute('data-scale'));
-        console.log(scale);
         if (prevGesture !== 5) {
           baseDepth = parm_depth / scale;
           console.log(baseDepth, parm_depth);
@@ -400,6 +400,8 @@ function executeGestureAction() {
         element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
         element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
       } else if (gesture === 0) {}
+    } else {
+      updateCurrentMaterialIndex(document.getElementsByClassName('resize-drag')[currentMaterialIndex]);
     }
   }
   prevGesture = gesture;
