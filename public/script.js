@@ -326,6 +326,37 @@ function showImage(imgUrl) {
   canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
 }
 
+function executeGestureAction() {
+  let ratio = document.documentElement.clientWidth / video.videoWidth;
+  let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
+  let y = parm_pos[1] * ratio;
+  let element = document.elementFromPoint(x, y);
+
+  if (element != null) {
+    if (element.className === 'resize-drag') {
+      if (gesture === 2 && prevGesture !== 2) {
+        document.getElementById('pdf-prev').click();
+      } else if (gesture === 3 && prevGesture !== 3) {
+        document.getElementById('pdf-next').click();
+      } else if (gesture === 5) {
+        // TODO : falseのとき1渡してるの後で絶対バグると思う
+        let scale = (element.hasAttribute('data-scale') ? element.dataset.scale : 1);
+        if (prevGesture !== 5) {
+          baseDepth = parm_depth / scale;
+        }
+        scale = parm_depth / baseDepth;
+        element.dataset.scale = scale;
+        element.style.width = element.width * scale + 'px'
+        element.style.height = element.height * scale + 'px'
+
+        element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
+        element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
+        element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
+      } else if (gesture === 0) {}
+    }
+  }
+}
+
 // Upon click this should should trigger click on the #file-to-upload file input element
 // This is better than showing the not-good-looking file input element
 document.getElementById('upload-button').onclick = function () {

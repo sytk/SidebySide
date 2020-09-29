@@ -41,7 +41,7 @@ async function HG() {
           break;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
-          const[raw_x, raw_y, raw_z] = raw_keypoints[i];
+          const [raw_x, raw_y, raw_z] = raw_keypoints[i];
           hand_keypoints[i][0] = x;
           hand_keypoints[i][1] = y;
           raw_hand_keypoints[i][0] = raw_x;
@@ -57,54 +57,23 @@ async function HG() {
 
     drawHand();
     const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText("fps:"+fps.toFixed(1), 20, 50);
-    fps_ctx.fillText("Gesture:"+gesture, 20, 80);
+    fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
+    fps_ctx.fillText("Gesture:" + gesture, 20, 80);
     fps_ctx.fillText(parm_depth, 20, 110);
 
     let data = new Float32Array(42);
-    data = raw_hand_keypoints.reduce((pre,current) => {pre.push(...current);return pre},[]);
-    let inputs = tf.tensor(data).reshape([1,42]); // テンソルに変換
+    data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);
+    let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
     prevGesture = gesture;
-    gesture =  maxIndex(predict);
-    if(gesture==1)
+    gesture = maxIndex(predict);
+    if(gesture == 1)
       gesture = 0;
 
     requestAnimationFrame(handTracking);
-
-    let ratio = document.documentElement.clientWidth / video.videoWidth;
-    let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
-    let y = parm_pos[1] * ratio;
-    let element = document.elementFromPoint(x, y);
-
-    if(element != null){
-      if(element.className === 'resize-drag') {
-        if (gesture === 2 && prevGesture !== 2) {
-          document.getElementById('pdf-prev').click();
-        } else if (gesture === 3 && prevGesture !== 3) {
-          document.getElementById('pdf-next').click();
-        } else if (gesture === 5) {
-          // TODO : falseのとき1渡してるの後で絶対バグると思う
-          let scale = (element.hasAttribute('data-scale') ? element.dataset.scale : 1);
-          if (prevGesture !== 5) {
-            baseDepth = parm_depth / scale;
-          }
-          scale = parm_depth / baseDepth;
-          element.dataset.scale = scale;
-          element.style.width = element.width * scale + 'px'
-          element.style.height = element.height * scale + 'px'
-
-          element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
-          element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
-          element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
-        } else if (gesture === 0) {
-          // document.getElementById('pdf-next').click();
-        }
-      }
-    }
-
-  };
+    executeGestureAction();
+  }
 
   function maxIndex(a) {
     let index = 0
@@ -121,33 +90,34 @@ async function HG() {
   function drawHand()
   {
     const connections = [
-        [0, 1], [1, 2], [2, 3], [3, 4],
-        [5, 6], [6, 7], [7, 8],
-        [9, 10], [10, 11], [11, 12],
-        [13, 14], [14, 15], [15, 16],
-        [17, 18], [18, 19], [19, 20],
-        [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
+      [0, 1], [1, 2], [2, 3], [3, 4],
+      [5, 6], [6, 7], [7, 8],
+      [9, 10], [10, 11], [11, 12],
+      [13, 14], [14, 15], [15, 16],
+      [17, 18], [18, 19], [19, 20],
+      [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
     ]
-    if (mask_canvas.getContext) {
+    if(mask_canvas.getContext)
+    {
       for(let i = 0; i < hand_keypoints.length; i++)
       {
-        const [x,y] = hand_keypoints[i];
-        mask_ctx.fillRect(x-5, y-5, 10,10);
+        const [x, y] = hand_keypoints[i];
+        mask_ctx.fillRect(x - 5, y - 5, 10, 10);
       }
       mask_ctx.fillStyle = "rgb(255,0,0)";
-      mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+      mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10, 10);
 
-      mask_ctx.beginPath() ;
+      mask_ctx.beginPath();
       for(let i = 0; i < connections.length; i++)
       {
         const s = connections[i][0]
         const t = connections[i][1]
-        mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
-        mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+        mask_ctx.moveTo(hand_keypoints[s][0], hand_keypoints[s][1]);
+        mask_ctx.lineTo(hand_keypoints[t][0], hand_keypoints[t][1]);
       }
       mask_ctx.strokeStyle = "rgb(0,255,0)";
-      mask_ctx.lineWidth = 3 ;
-      mask_ctx.stroke() ;
+      mask_ctx.lineWidth = 3;
+      mask_ctx.stroke();
     }
   }
   function calcDepth(a,b)
