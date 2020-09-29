@@ -10,7 +10,32 @@ async function HG() {
   const landmark_model = await handpose.load();
   const gesture_model = await tf.loadLayersModel('./model/model.json');
 
-  const video = document.getElementById('camera');
+  //const video = document.getElementById('camera');
+  // var videocanvas;
+  // function outputVideo2(){
+  //   var video = document.getElementById("camera");
+    
+  //   setInterval(function(){
+  //     videocanvas = document.getElementById("videocanvas");
+  //     videocanvas.getContext("2d").drawImage(video, 0, 0, 480, 270);
+  //   }, 1000/30);
+  //   //console.log(videocanvas.height);
+  // }
+  var video = document.getElementById("camera");
+  var videowidth = video.videoWidth ;
+	var videoheight = video.videoHeight ;
+  var videocanvas = document.getElementById("videocanvas");
+  videocanvas.width = videowidth;
+  videocanvas.height = videoheight;
+  canvasCtx = videocanvas.getContext('2d');
+  outputVideo2();
+  function outputVideo2() {
+    canvasCtx.drawImage(video, 0, 0);
+    requestAnimationFrame(outputVideo2);
+  };
+  
+  console.log(videocanvas.height);
+  console.log(videocanvas.width);
   const mask_canvas = document.getElementById('mask');
   const mask_ctx = mask_canvas.getContext('2d');
 
@@ -28,7 +53,7 @@ async function HG() {
     mask_ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
-    const predictions = await landmark_model.estimateHands(video);
+    const predictions = await landmark_model.estimateHands(videocanvas);
 
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
     fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
