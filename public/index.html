@@ -29,22 +29,18 @@
     <canvas id="fps" class="fps" style="background-color:white"></canvas>
   </div>
 
-  <input type="button" value="手の表示"
-       onclick="document.getElementById('mask').style.visibility = 'visible';">
-  <input type="button" value="手の非表示"
-       onclick="document.getElementById('mask').style.visibility = 'hidden';">
-
-  <button id="upload-button">Select PDF or Image</button>
-  <input type="file" id="file-to-upload" accept="application/pdf, image/jpeg, image/png, image/gif" />
-
-  <div id="pdf-meta">
-    <div id="pdf-buttons">
-      <button id="pdf-prev" disabled>Previous</button>
-      <button id="pdf-next" disabled>Next</button>
-      <button id="pdf-hide" disabled>Hide</button>
-      <button id="pdf-show" disabled>Show</button>
-      <button id="pdf-delete" disabled>Delete</button>
-    </div>
+  <div id="control-panel">
+    <input type="button" value="手の表示"
+           onclick="document.getElementById('mask').style.visibility = 'visible';">
+    <input type="button" value="手の非表示"
+           onclick="document.getElementById('mask').style.visibility = 'hidden';">
+    <button id="pdf-prev" disabled>Previous</button>
+    <button id="pdf-next" disabled>Next</button>
+    <button id="pdf-hide" disabled>Hide</button>
+    <button id="pdf-show" disabled>Show</button>
+    <button id="pdf-delete" disabled>Delete</button>
+    <button id="upload-button">Select PDF or Image</button>
+    <input type="file" id="file-to-upload" accept="application/pdf, image/jpeg, image/png, image/gif" />
   </div>
 
   <!-- モーダルウィンドウ -->
