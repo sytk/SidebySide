@@ -339,7 +339,6 @@ function showPage(pageNo) {
     canvasCtx = canvas.getContext('2d');
 
     canvas.dataset.page = pageNo;
-    canvas.dataset.scale = 1.0;
 
   // Disable Prev & Next buttons while page is being loaded
   if (canvas.dataset.page === '1') {
@@ -387,11 +386,17 @@ function executeGestureAction() {
         document.getElementById('pdf-next').click();
       } else if (gesture === 5) {
         // TODO : falseのとき1渡してるの後で絶対バグると思う
-        let scale = (element.hasAttribute('data-scale') ? element.dataset.scale : 1);
+        let scale = element.hasAttribute('data-scale') ? element.dataset.scale : 1;
+        console.log(element.hasAttribute('data-scale'));
+        console.log(scale);
         if (prevGesture !== 5) {
           baseDepth = parm_depth / scale;
+          console.log(baseDepth, parm_depth);
         }
         scale = parm_depth / baseDepth;
+        if (isNaN(scale)) {
+          scale = 1;
+        }
         element.dataset.scale = scale;
         element.style.width = element.width * scale + 'px'
         element.style.height = element.height * scale + 'px'
