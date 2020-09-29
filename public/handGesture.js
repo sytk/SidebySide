@@ -33,12 +33,15 @@ async function HG() {
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
     fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
 
-    if (predictions.length > 0) {
-      for (let i = 0; i < predictions.length; i++) {
-        const keypoints = predictions[i].landmarks;
-        const raw_keypoints = predictions[i].rawLandmarks;
-        if (raw_keypoints[17][0] > raw_keypoints[5][0])
-          break;
+    let has_hand = false;
+
+    for (let i = 0; i < predictions.length; i++) {
+      const keypoints = predictions[i].landmarks;
+      const raw_keypoints = predictions[i].rawLandmarks;
+
+      if (raw_keypoints[17][0] < raw_keypoints[5][0])
+      {
+        has_hand = true;
         for (let i = 0; i < keypoints.length; i++) {
           const [x, y, z] = keypoints[i];
           const [raw_x, raw_y, raw_z] = raw_keypoints[i];
@@ -47,13 +50,19 @@ async function HG() {
           raw_hand_keypoints[i][0] = raw_x;
           raw_hand_keypoints[i][1] = raw_y;
         }
+
+        calcParmPos();
+        calcDepth(hand_keypoints[5], hand_keypoints[17]);
+        drawHand();
+
+        break;
       }
     }
+    if(!has_hand)
+    {
+      parm_pos = new Array(2).fill(undefined);
+    }
 
-    calcParmPos();
-    calcDepth(hand_keypoints[5], hand_keypoints[17]);
-
-    drawHand();
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
     fps_ctx.fillText("Gesture:" + gesture, 20, 80);
@@ -64,6 +73,7 @@ async function HG() {
     let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
+
 
     updateGesture(maxIndex(predict));
 
@@ -169,6 +179,7 @@ async function HG() {
     if(performance.now() - start_time > 200)
       gesture = predict;
     prev_predict = predict
+
   }
 }
 

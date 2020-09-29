@@ -376,6 +376,8 @@ function executeGestureAction() {
   let ratio = document.documentElement.clientWidth / video.videoWidth;
   let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
   let y = parm_pos[1] * ratio;
+  if(isNaN(x) || isNaN(y))
+    x = y = -1;
   let element = document.elementFromPoint(x, y);
 
   if (element != null) {
