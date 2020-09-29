@@ -121,19 +121,8 @@ video {
   transform: translateY(-7px);
 }
 
-#upload-button {
-	width: 150px;
-	display: block;
-	margin: 20px auto;
-}
-
 #file-to-upload {
 	display: none;
-}
-
-#pdf-main-container {
-	width: 400px;
-	margin: 20px auto;
 }
 
 #pdf-loader {
@@ -145,34 +134,9 @@ video {
 	height: 100px;
 }
 
-#pdf-contents {
-	display: none;
-}
-
-#pdf-meta {
+#control-panel {
 	overflow: hidden;
 	margin: 0 0 20px 0;
-}
-
-#pdf-buttons {
-	float: left;
-}
-
-#page-count-container {
-	float: right;
-}
-
-#pdf-current-page {
-	display: inline;
-}
-
-#pdf-total-pages {
-	display: inline;
-}
-
-#pdf-canvas {
-	border: 1px solid rgba(0,0,0,0.2);
-	box-sizing: border-box;
 }
 
 #selected {
