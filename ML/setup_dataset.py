@@ -35,6 +35,7 @@ detector = HandGesture()
 
 
 for cat in categories:
+    if cat == 8 or cat == 7;
     files = glob.glob(os.path.join(dir, cat, '*.JPG'))
     y = cat_dict[cat]
     num_all = len(files)
@@ -67,7 +68,7 @@ for cat in categories:
 print(np.asarray(X_train).shape,np.asarray(Y_train).shape)
 print(np.asarray(X_test).shape,np.asarray(Y_test).shape)
 
-np.save('./X_train', np.asarray(X_train))
-np.save('./Y_train', np.asarray(Y_train))
-np.save('./X_test', np.asarray(X_test))
-np.save('./Y_test', np.asarray(Y_test))
+np.save('./X_train_mini', np.asarray(X_train))
+np.save('./Y_train_mini', np.asarray(Y_train))
+np.save('./X_test_mini', np.asarray(X_test))
+np.save('./Y_test_mini', np.asarray(Y_test))
