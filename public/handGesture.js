@@ -50,10 +50,8 @@ async function HG() {
       }
     }
 
-    for(let i = 0; i < 2; i++)
-      parm_pos[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
-
-    parm_depth = calcDepth(hand_keypoints[5], hand_keypoints[17]);
+    calcParmPos();
+    calcDepth(hand_keypoints[5], hand_keypoints[17]);
 
     drawHand();
     const fps = 1000 / (performance.now() - start);
@@ -68,6 +66,7 @@ async function HG() {
     let predict = await outputs.data();
     prevGesture = gesture;
     gesture = maxIndex(predict);
+
     if(gesture == 1)
       gesture = 0;
 
@@ -130,6 +129,7 @@ async function HG() {
 
     }
   }
+  let prev_parm_depth = 0;
   function calcDepth(a,b)
   {
     if(a.length != b.length)
@@ -139,9 +139,28 @@ async function HG() {
     {
       val += Math.pow(b[i] - a[i], 2);
     }
+    let k = 0.7;
+    let LPF = (1-k) * val + k * prev_parm_depth;
+    prev_parm_depth = LPF;
     // return Math.sqrt(val);
-    return val;
+    parm_depth = LPF;
   }
+  let prev_parm_pos = new Array(2).fill(0);
+  function calcParmPos()
+  {
+    let val = new Array(2).fill(0);
+    for(let i = 0; i < 2; i++)
+      val[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
+
+    let k = 0.7;
+    let LPF = new Array(2);
+    for(let i = 0; i < 2; i++)
+    {
+      LPF[i] = (1-k) * val[i] + k * prev_parm_pos[i];
+      parm_pos[i] = prev_parm_pos[i] = LPF[i];
+    }
+  }
+
 }
 
 /*
