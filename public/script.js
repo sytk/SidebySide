@@ -373,8 +373,6 @@ function showPage(pageNo) {
   });
 }
 
-
-
 function executeGestureAction() {
   let ratio = document.documentElement.clientWidth / video.videoWidth;
   let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
@@ -404,6 +402,7 @@ function executeGestureAction() {
       } else if (gesture === 0) {}
     }
   }
+  prevGesture = gesture;
 }
 
 // Upon click this should should trigger click on the #file-to-upload file input element

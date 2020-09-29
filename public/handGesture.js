@@ -64,8 +64,8 @@ async function HG() {
     let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
-    prevGesture = gesture;
-    gesture = maxIndex(predict);
+
+    updateGesture(maxIndex(predict));
 
     if(gesture == 1)
       gesture = 0;
@@ -152,7 +152,7 @@ async function HG() {
     for(let i = 0; i < 2; i++)
       val[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
 
-    let k = 0.7;
+    let k = 0.6;
     let LPF = new Array(2);
     for(let i = 0; i < 2; i++)
     {
@@ -160,7 +160,16 @@ async function HG() {
       parm_pos[i] = prev_parm_pos[i] = LPF[i];
     }
   }
-
+  let start_time = 0;
+  let prev_predict = 0;
+  function updateGesture(predict)
+  {
+    if(prev_predict != predict)
+      start_time = performance.now();
+    if(performance.now() - start_time > 200)
+      gesture = predict;
+    prev_predict = predict
+  }
 }
 
 /*
