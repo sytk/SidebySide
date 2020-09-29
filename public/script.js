@@ -211,15 +211,7 @@ function showPDF(pdfUrl) {
   let canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
   canvas.dataset.materialIndex = currentMaterialIndex;
-
-  canvas.width = 300
-  currentMaterialElements = document.getElementsByClassName('resize-drag');
-  let sum = 0;
-  for(let i = 0; i < currentMaterialElements.length; i++)
-    sum += currentMaterialElements[i].height
-    console.log(sum);
-  canvas.style.top = sum + 'px';
-  canvas.style.left = 0 + 'px';
+  canvas.width = 1000
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     materials.push(pdfDoc);
@@ -241,6 +233,10 @@ function showPDF(pdfUrl) {
 
     alert(error.message);
   });
+  interval = 200;
+  canvas.style.top = currentMaterialIndex*interval + 'px';
+  canvas.style.left = 0 + 'px';
+  canvas.style.width = 300 + 'px';
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
@@ -250,15 +246,7 @@ function showImage(imgUrl) {
   canvas.classList.add('resize-drag');
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   canvas.dataset.materialIndex = currentMaterialIndex;
-
-  canvas.width = 300
-  currentMaterialElements = document.getElementsByClassName('resize-drag');
-  let sum = 0;
-  for(let i = 0; i < currentMaterialElements.length; i++)
-    sum += currentMaterialElements[i].height
-    console.log(sum);
-  canvas.style.top = sum + 'px';
-  canvas.style.left = 0 + 'px';
+  canvas.width = 1000
 
   const canvasCtx = canvas.getContext('2d');
   const img = new Image();
@@ -275,6 +263,11 @@ function showImage(imgUrl) {
   document.getElementById('pdf-hide').removeAttribute('disabled');
   document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
+
+  interval = 200;
+  canvas.style.top = currentMaterialIndex*interval + 'px';
+  canvas.style.left = 0 + 'px';
+  canvas.style.width = 300 + 'px';
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
