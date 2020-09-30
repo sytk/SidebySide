@@ -242,6 +242,7 @@ function showPDF(pdfUrl) {
   canvas.style.top = currentMaterialIndex*interval + 'px';
   canvas.style.left = 0 + 'px';
   canvas.style.width = 300 + 'px';
+  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
@@ -275,6 +276,7 @@ function showImage(imgUrl) {
   canvas.style.top = currentMaterialIndex*interval + 'px';
   canvas.style.left = 0 + 'px';
   canvas.style.width = 300 + 'px';
+  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
@@ -390,33 +392,31 @@ function executeGestureAction() {
   let element = document.elementFromPoint(x, y);
   if (element != null) {
     if (element.className === 'resize-drag') {
-      console.log(element.style.zIndex);
       replaceZindex(element);
       updateCurrentMaterialIndex(element);
       element.setAttribute('id', 'grabbing');
+
       if (gesture === 2 && prevGesture !== 2) {
         document.getElementById('pdf-prev').click();
       } else if (gesture === 3 && prevGesture !== 3) {
         document.getElementById('pdf-next').click();
-      } else if (gesture === 5) {
-        // TODO : falseのとき1渡してるの後で絶対バグると思う
-        let scale = element.hasAttribute('data-scale') ? element.dataset.scale : 1;
-        if (prevGesture !== 5) {
+      } else if (gesture === 4) {
+        let scale = element.dataset.scale;
+        if (element.id !== grabbing) {
           baseDepth = parm_depth / scale;
-          console.log(baseDepth, parm_depth);
         }
         scale = parm_depth / baseDepth;
-        if (isNaN(scale)) {
-          scale = 1;
-        }
         element.dataset.scale = scale;
         element.style.width = element.width * scale + 'px'
         element.style.height = element.height * scale + 'px'
 
         element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
+      } else if (gesture === 5) {
         element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
         element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
       } else if (gesture === 0) {}
+      updateCurrentMaterialIndex(element);
+      element.setAttribute('id', 'grabbing');
     } else {
       updateCurrentMaterialIndex(document.getElementsByClassName('resize-drag')[currentMaterialIndex]);
     }
