@@ -1,0 +1,23 @@
+{
+  "name": "sidebyside",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sytk/SidebySide.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sytk/SidebySide/issues"
+  },
+  "homepage": "https://github.com/sytk/SidebySide#readme",
+  "dependencies": {
+    "electron": "^10.1.3",
+    "screen": "^0.2.10"
+  }
+}
