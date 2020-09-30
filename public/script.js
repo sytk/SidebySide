@@ -377,17 +377,14 @@ function executeGestureAction() {
 
   if (element != null) {
     if (element.className === 'resize-drag') {
-      updateCurrentMaterialIndex(element);
-      element.setAttribute('id', 'grabbing');
       if (gesture === 2 && prevGesture !== 2) {
         document.getElementById('pdf-prev').click();
       } else if (gesture === 3 && prevGesture !== 3) {
         document.getElementById('pdf-next').click();
-      } else if (gesture === 5) {
+      } else if (gesture === 4) {
         let scale = element.dataset.scale;
-        if (prevGesture !== 5) {
+        if (element.id !== grabbing) {
           baseDepth = parm_depth / scale;
-          console.log(baseDepth, parm_depth);
         }
         scale = parm_depth / baseDepth;
         element.dataset.scale = scale;
@@ -395,9 +392,12 @@ function executeGestureAction() {
         element.style.height = element.height * scale + 'px'
 
         element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
+      } else if (gesture === 5) {
         element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
         element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
       } else if (gesture === 0) {}
+      updateCurrentMaterialIndex(element);
+      element.setAttribute('id', 'grabbing');
     } else {
       updateCurrentMaterialIndex(document.getElementsByClassName('resize-drag')[currentMaterialIndex]);
     }
