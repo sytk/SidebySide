@@ -27,8 +27,6 @@ video {
   min-width: 100%;
   min-height: 100%;
 
-  /* background-size: cover; */
-  /* z-index: -1; */
   transform: scale(-1, 1);
 }
 .mask {
@@ -62,6 +60,8 @@ video {
   left: 0;
   width: 200pt;
   height: 100pt;
+  z-index:100
+  
 }
 
 
