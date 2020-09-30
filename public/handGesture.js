@@ -1,5 +1,46 @@
+// import('https://unpkg.com/@tensorflow/tfjs@2.1.0');
+// import('https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js');
+// import('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js');
+// import('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
+// //importScripts('http://127.0.0.1:8887/public/handpose.js');
+
+//import * as handpose from 'http://127.0.0.1:8887/public/handpose.js';
+var mask_canvas;
+var videocanvas;
+self.addEventListener('message', ({ data }) => {
+// onmessageイベントハンドラーでメインスレッドからのメッセージを受け取る
+//onmessage = (event) => {
+  importScripts('http://127.0.0.1:8887/public/handpose.js');
+  importScripts('https://unpkg.com/@tensorflow/tfjs@2.1.0');
+  importScripts('https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js');
+  importScripts('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js');
+  importScripts('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
+  // メインスレッドからOffscreenCanvasを受け取る
+  //mask_canvas = event.data.canvas;
+  console.log("handGesutre.js");
+  console.log(data);
+  if (data.type === 'frame'){
+    console.log("found frame");
+    videocanvas = data.imageData;
+    if (videocanvas != undefined){
+      console.log(data.imageData);
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+    canvas.width = imagedata.width;
+    canvas.height = imagedata.height;
+      HG()
+    }
+  }
+  //offscreenCanvas = data;
+  //console.log(offscreenCanvas.canvas);
+  // 以降、offscreenCanvasは通常のCanvasと同様に処理ができる
+  
+//};
+});
+
 async function HG() {
   // Load the MediaPipe handpose model assets.
+  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   let hand_keypoints = new Array(21);
   let raw_hand_keypoints = new Array(21);
   for(let i = 0; i < 21; i++) {
@@ -21,28 +62,29 @@ async function HG() {
   //   }, 1000/30);
   //   //console.log(videocanvas.height);
   // }
-  var video = document.getElementById("camera");
-  var videowidth = video.videoWidth ;
-	var videoheight = video.videoHeight ;
-  var videocanvas = document.getElementById("videocanvas");
-  videocanvas.width = videowidth;
-  videocanvas.height = videoheight;
-  canvasCtx = videocanvas.getContext('2d');
-  outputVideo2();
-  function outputVideo2() {
-    canvasCtx.drawImage(video, 0, 0);
-    requestAnimationFrame(outputVideo2);
-  };
+
+  // var video = document.getElementById("camera");
+  // var videowidth = video.videoWidth ;
+	// var videoheight = video.videoHeight ;
+  // var videocanvas = document.getElementById("videocanvas");
+  // videocanvas.width = videowidth;
+  // videocanvas.height = videoheight;
+  // canvasCtx = videocanvas.getContext('2d');
+  // outputVideo2();
+  // function outputVideo2() {
+  //   canvasCtx.drawImage(video, 0, 0);
+  //   requestAnimationFrame(outputVideo2);
+  // };
   
   console.log(videocanvas.height);
   console.log(videocanvas.width);
-  const mask_canvas = document.getElementById('mask');
+  //const mask_canvas = document.getElementById('mask');
   const mask_ctx = mask_canvas.getContext('2d');
 
-  const fps_canvas = document.getElementById('fps');
-  const fps_ctx = fps_canvas.getContext('2d');
+  //const fps_canvas = document.getElementById('fps');
+  //const fps_ctx = fps_canvas.getContext('2d');
 
-  fps_ctx.font = '20pt Arial';
+  // fps_ctx.font = '20pt Arial';
   mask_canvas.width = video.videoWidth;
   mask_canvas.height = video.videoHeight;
 
@@ -56,7 +98,7 @@ async function HG() {
     const predictions = await landmark_model.estimateHands(videocanvas);
 
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
-    fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
+    // fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
 
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
@@ -79,10 +121,10 @@ async function HG() {
     calcDepth(hand_keypoints[5], hand_keypoints[17]);
 
     drawHand();
-    const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
-    fps_ctx.fillText("Gesture:" + gesture, 20, 80);
-    fps_ctx.fillText(parm_depth, 20, 110);
+    // const fps = 1000 / (performance.now() - start);
+    // fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
+    // fps_ctx.fillText("Gesture:" + gesture, 20, 80);
+    // fps_ctx.fillText(parm_depth, 20, 110);
 
     let data = new Float32Array(42);
     data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);

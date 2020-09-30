@@ -38,9 +38,49 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    HG();
+    
+    video2canvas()
+
+    //HG();
   });
 };
+var videocanvas = new OffscreenCanvas(100, 1);
+var imageData;
+console.log(imageData);
+function video2canvas(){
+  var video = document.getElementById("camera");
+  var videowidth = video.videoWidth ;
+  var videoheight = video.videoHeight ;
+
+  //var videocanvas = document.getElementById("videocanvas");
+  videocanvas.width = videowidth;
+  videocanvas.height = videoheight;
+  canvasCtx = videocanvas.getContext('2d');
+  drow2canvas();
+  console.log(videocanvas);
+  const imageData = canvasCtx.getImageData(0, 0, videocanvas.width, videocanvas.height)
+    // Canvas要素を取得する
+
+  //const videocanvas = document.getElementById("videocanvas");
+  const maskcanvas = document.getElementById("mask");
+  // Canvas要素の描画コントロールをOffscreenCanvasに委譲する
+  //const offscreenCanvas = maskcanvas.transferControlToOffscreen();
+  const canvas = new OffscreenCanvas(100, 1);
+  // Workerを作成し、OffscreenCanvasを渡す
+  //const bitmap = createImageBitmap(videocanvas);
+  const worker = new Worker("handGesture.js");
+  //worker.postMessage({ type: 'frame', videocanvas}[videocanvas]);
+  //worker.postMessage({ canvas: "canvas"});
+  //worker.postMessage({type: 'frame', imageData});
+  
+  worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
+
+  function drow2canvas() {
+    canvasCtx.drawImage(video, 0, 0);
+    requestAnimationFrame(drow2canvas);
+  };
+};
+
 
 // モーダルウィンドウ表示
 function modalBlock() { document.getElementById('modal').style.display = 'block'; }
