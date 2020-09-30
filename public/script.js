@@ -141,7 +141,7 @@ interact('.resize-drag')
         let target = event.target
         let x = target.getBoundingClientRect().left + window.pageXOffset;
         let y = target.getBoundingClientRect().top + window.pageYOffset;
-
+        replaceZindex(target);
         // update the element's style
         let ratio;
         if (target.hasAttribute('data-ratio')) {
@@ -193,9 +193,12 @@ interact('.resize-drag')
       })
     ]
   })
-
+  .on('tap', function (event) {
+    replaceZindex(event.target);
+  })
 function dragMoveListener(event) {
   let target = event.target
+  replaceZindex(target);
   // keep the dragged position in the data-x/data-y attributes
   let x = target.getBoundingClientRect().left + window.pageXOffset + event.dx;
   let y = target.getBoundingClientRect().top + window.pageYOffset + event.dy;
@@ -212,6 +215,8 @@ function showPDF(pdfUrl) {
   canvas.classList.add('resize-drag');
   canvas.dataset.materialIndex = currentMaterialIndex;
   canvas.width = 1000
+  canvas.style.zIndex = currentMaterialIndex+10;
+  document.getElementById('material-area').appendChild(canvas);
 
   PDFJS.getDocument({ url: pdfUrl }).then(function (pdfDoc) {
     materials.push(pdfDoc);
@@ -219,7 +224,7 @@ function showPDF(pdfUrl) {
     canvas.dataset.numPages = numPages;
     // Show the first page
     canvas.dataset.page = 1;
-    document.body.appendChild(canvas);
+    // document.body.appendChild(canvas);
     showPage(1);
 
     document.getElementById('pdf-hide').removeAttribute('disabled');
@@ -247,6 +252,8 @@ function showImage(imgUrl) {
   currentMaterialIndex = document.getElementsByClassName('resize-drag').length;
   canvas.dataset.materialIndex = currentMaterialIndex;
   canvas.width = 1000
+  canvas.style.zIndex = currentMaterialIndex+10;
+  document.getElementById('material-area').appendChild(canvas);
 
   const canvasCtx = canvas.getContext('2d');
   const img = new Image();
@@ -259,7 +266,7 @@ function showImage(imgUrl) {
 
   canvas.dataset.page = 1;
   canvas.dataset.numPages = 1;
-  document.body.appendChild(canvas);
+  // document.body.appendChild(canvas);
   document.getElementById('pdf-hide').removeAttribute('disabled');
   document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
@@ -364,7 +371,16 @@ function showPage(pageNo) {
     page.render(renderContext);
   });
 }
-
+function replaceZindex(element)
+{
+  let materials = document.getElementsByClassName('resize-drag');
+  for(let i = 0; i < materials.length; i++)
+    if(materials[i].style.zIndex > element.style.zIndex)
+    {
+      materials[i].style.zIndex--;
+    }
+  element.style.zIndex = materials.length+10;
+}
 function executeGestureAction() {
   let ratio = document.documentElement.clientWidth / video.videoWidth;
   let x = document.documentElement.clientWidth - parm_pos[0] * ratio;
@@ -372,9 +388,10 @@ function executeGestureAction() {
   if(isNaN(x) || isNaN(y))
     x = y = -1;
   let element = document.elementFromPoint(x, y);
-
   if (element != null) {
     if (element.className === 'resize-drag') {
+      console.log(element.style.zIndex);
+      replaceZindex(element);
       updateCurrentMaterialIndex(element);
       element.setAttribute('id', 'grabbing');
       if (gesture === 2 && prevGesture !== 2) {

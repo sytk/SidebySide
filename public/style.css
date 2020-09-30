@@ -44,6 +44,18 @@ video {
 
   transform: scale(-1, 1);
 }
+#material-area
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: auto;
+  height: auto;
+
+  min-width: 100%;
+  min-height: 100%;
+}
 .fps {
   position: absolute;
   top: 0;
@@ -162,4 +174,13 @@ video {
 	margin: 20px auto 0 auto;
 	font-size: 13px;
 	text-align: center;
+}
+
+#pdf-loader {
+	display: none;
+	text-align: center;
+	color: #999999;
+	font-size: 13px;
+	line-height: 100px;
+	height: 100px;
 }
