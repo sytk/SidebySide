@@ -283,13 +283,12 @@ function showImage(imgUrl) {
 }
 
 function updateCurrentMaterialIndex(canvas) {
-  console.log('update currentCanvas');
-  // if (currentMaterialIndex != canvas.dataset.materialIndex) {
-    let currentCanas = document.getElementsByClassName('resize-drag')[currentMaterialIndex];
-    currentCanas.removeAttribute('id');
+  let currentCanvas = document.getElementsByClassName('resize-drag')[currentMaterialIndex];
+  if (typeof canvas !== 'undefined' && typeof currentCanvas !== 'undefined') {
+    currentCanvas.removeAttribute('id');
     currentMaterialIndex = canvas.dataset.materialIndex;
     canvas.setAttribute('id', 'selected');
-  // }
+  }
 }
 
 function showPDFthumbnail () {
