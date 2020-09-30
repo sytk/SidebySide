@@ -274,7 +274,7 @@ function showImage(imgUrl) {
 }
 
 function updateCurrentMaterialIndex(canvas) {
-  console.log('update currentCanas');
+  console.log('update currentCanvas');
   // if (currentMaterialIndex != canvas.dataset.materialIndex) {
     let currentCanas = document.getElementsByClassName('resize-drag')[currentMaterialIndex];
     currentCanas.removeAttribute('id');
@@ -480,4 +480,28 @@ function deletePDF() {
     canvases[i].dataset.materialIndex = i;
   }
   currentMaterialIndex = 0;
+}
+
+document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
+function deletePDF() {
+  let canvases = document.getElementsByClassName('resize-drag');
+  document.body.removeChild(canvases[currentMaterialIndex]);
+
+  materials.splice(currentMaterialIndex, 1);
+  for (let i = 0; i < canvases.length; i++) {
+    canvases[i].dataset.materialIndex = i;
+  }
+  currentMaterialIndex = 0;
+}
+
+document.getElementById('HG-details').addEventListener("click", ()=>{ switchHGdisplay(); });
+function switchHGdisplay() {
+  if(document.getElementById('mask').style.visibility == 'hidden')
+    document.getElementById('mask').style.visibility = 'visible';
+  else
+    document.getElementById('mask').style.visibility = 'hidden';
+  if(document.getElementById('fps').style.visibility == 'hidden')
+    document.getElementById('fps').style.visibility = 'visible';
+  else
+    document.getElementById('fps').style.visibility = 'hidden';
 }
