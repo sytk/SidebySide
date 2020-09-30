@@ -488,8 +488,7 @@ document.getElementById('pdf-show').onclick = function () {
 document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
 function deletePDF() {
   let canvases = document.getElementsByClassName('resize-drag');
-  document.getElementById('material-area').removeChild(canvases[currentMaterialIndex]);
-
+  canvases[currentMaterialIndex].remove()
   materials.splice(currentMaterialIndex, 1);
   for (let i = 0; i < canvases.length; i++) {
     canvases[i].dataset.materialIndex = i;
