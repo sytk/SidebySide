@@ -11,7 +11,7 @@ let fileNames = [];
 
 window.onload = () => {
   console.log("window on load");
-
+  document.getElementById('fps').style.visibility = 'hidden';
   /** カメラ設定 */
   const constraints = {
     audio: false,
@@ -489,19 +489,7 @@ document.getElementById('pdf-show').onclick = function () {
 document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
 function deletePDF() {
   let canvases = document.getElementsByClassName('resize-drag');
-  document.body.removeChild(canvases[currentMaterialIndex]);
-
-  materials.splice(currentMaterialIndex, 1);
-  for (let i = 0; i < canvases.length; i++) {
-    canvases[i].dataset.materialIndex = i;
-  }
-  currentMaterialIndex = 0;
-}
-
-document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
-function deletePDF() {
-  let canvases = document.getElementsByClassName('resize-drag');
-  document.body.removeChild(canvases[currentMaterialIndex]);
+  document.getElementById('material-area').removeChild(canvases[currentMaterialIndex]);
 
   materials.splice(currentMaterialIndex, 1);
   for (let i = 0; i < canvases.length; i++) {
