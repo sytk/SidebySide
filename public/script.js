@@ -383,7 +383,7 @@ function executeGestureAction() {
         document.getElementById('pdf-next').click();
       } else if (gesture === 4) {
         let scale = element.dataset.scale;
-        if (element.id !== grabbing) {
+        if (prevGesture !== 4) {
           baseDepth = parm_depth / scale;
         }
         scale = parm_depth / baseDepth;
