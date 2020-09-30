@@ -132,7 +132,7 @@ async function HG() {
 
       // mask_ctx.fillText(gesture, parm_pos[0], parm_pos[1]);
       mask_ctx.beginPath() ;
-      mask_ctx.arc(parm_pos[0], parm_pos[1], 50, 0, Math.PI * 2, true);
+      mask_ctx.arc(parm_pos[0], parm_pos[1], 50*(parm_depth/3000), 0, Math.PI * 2, true);
       mask_ctx.stroke() ;
 
       // mask_ctx.drawImage(img, parm_pos[0] - 50, parm_pos[1]- 50, 100, 100);  // ★ここを変更★
