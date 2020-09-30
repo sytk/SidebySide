@@ -237,6 +237,7 @@ function showPDF(pdfUrl) {
   canvas.style.top = currentMaterialIndex*interval + 'px';
   canvas.style.left = 0 + 'px';
   canvas.style.width = 300 + 'px';
+  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
@@ -268,6 +269,7 @@ function showImage(imgUrl) {
   canvas.style.top = currentMaterialIndex*interval + 'px';
   canvas.style.left = 0 + 'px';
   canvas.style.width = 300 + 'px';
+  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
 
   // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
@@ -382,16 +384,12 @@ function executeGestureAction() {
       } else if (gesture === 3 && prevGesture !== 3) {
         document.getElementById('pdf-next').click();
       } else if (gesture === 5) {
-        // TODO : falseのとき1渡してるの後で絶対バグると思う
-        let scale = element.hasAttribute('data-scale') ? element.dataset.scale : 1;
+        let scale = element.dataset.scale;
         if (prevGesture !== 5) {
           baseDepth = parm_depth / scale;
           console.log(baseDepth, parm_depth);
         }
         scale = parm_depth / baseDepth;
-        if (isNaN(scale)) {
-          scale = 1;
-        }
         element.dataset.scale = scale;
         element.style.width = element.width * scale + 'px'
         element.style.height = element.height * scale + 'px'
