@@ -13,6 +13,9 @@ async function HG() {
   const video = document.getElementById('camera');
   const mask_canvas = document.getElementById('mask');
   const mask_ctx = mask_canvas.getContext('2d');
+  var predictions = await landmark_model.estimateHands(video);
+  const loadimg = document.getElementById("loading-area").style.display ="none";
+  console.log("complite loading");
 
   const fps_canvas = document.getElementById('fps');
   const fps_ctx = fps_canvas.getContext('2d');
@@ -28,8 +31,7 @@ async function HG() {
     mask_ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
-    const predictions = await landmark_model.estimateHands(video);
-
+    predictions = await landmark_model.estimateHands(video);
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
     fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
 
