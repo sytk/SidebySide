@@ -140,11 +140,11 @@ video {
 }
 
 #selected {
-  border:solid 5px #0000FF;
+  border:solid 5px #000080;
 }
 
 #grabbing {
-    border:solid 5px #00FF00;
+    border:solid 5px #008000;
 }
 
 #page-loader {
