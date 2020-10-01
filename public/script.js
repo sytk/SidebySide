@@ -413,6 +413,8 @@ function executeGestureAction() {
         element.textContent = Math.round(element.style.width) + '\u00D7' + Math.round(element.style.height)
         element.style.left = x - parseFloat(element.style.width) / 2 + 'px';
         element.style.top = y - parseFloat(element.style.height) / 2 + 'px';
+      } else if (gesture === 7) {
+          document.getElementById('pdf-hide').click();
       } else if (gesture === 0) {}
       updateCurrentMaterialIndex(element);
       element.setAttribute('id', 'grabbing');
