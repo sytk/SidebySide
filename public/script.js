@@ -297,6 +297,12 @@ function showImage(imgUrl) {
   canvas.width = 1000
   canvas.style.zIndex = currentMaterialIndex+10;
   document.getElementById('material-area').appendChild(canvas);
+  canvas.style.width = 300 + 'px';
+
+  interval = 200;
+  canvas.org_top = canvas.style.top = currentMaterialIndex*interval + 'px';
+  canvas.org_left = canvas.style.left =  0 + 'px';
+  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
 
   const canvasCtx = canvas.getContext('2d');
   const img = new Image();
@@ -314,13 +320,6 @@ function showImage(imgUrl) {
   document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
 
-  interval = 200;
-  canvas.style.top = currentMaterialIndex*interval + 'px';
-  canvas.style.left = 0 + 'px';
-  canvas.style.width = 300 + 'px';
-  canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
-
-  // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
 }
 

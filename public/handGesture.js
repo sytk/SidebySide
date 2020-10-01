@@ -68,8 +68,6 @@ async function HG() {
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
     fps_ctx.fillText("Gesture:" + gesture, 20, 80);
-    fps_ctx.fillText(parm_pos[0], 20, 110);
-    fps_ctx.fillText(parm_pos[1], 20, 140);
 
     let data = new Float32Array(42);
     data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);
@@ -133,8 +131,9 @@ async function HG() {
       // mask_ctx.stroke() ;
 
       // mask_ctx.fillText(gesture, parm_pos[0], parm_pos[1]);
+
       mask_ctx.beginPath() ;
-      mask_ctx.arc(parm_pos[0], parm_pos[1], 50*(parm_depth/3000), 0, Math.PI * 2, true);
+      mask_ctx.arc(parm_pos[0], parm_pos[1], 30*(Math.sqrt(parm_depth)/55), 0, Math.PI * 2, true);
       mask_ctx.stroke() ;
 
       // mask_ctx.drawImage(img, parm_pos[0] - 50, parm_pos[1]- 50, 100, 100);  // ★ここを変更★
