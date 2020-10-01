@@ -109,35 +109,33 @@ async function HG() {
       [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
     ]
     if (mask_canvas.getContext) {
-      // for(let i = 0; i < hand_keypoints.length; i++)
-      // {
-      //   const [x,y] = hand_keypoints[i];
-      //   mask_ctx.fillRect(x-5, y-5, 10,10);
-      // }
-      // mask_ctx.fillStyle = "rgb(255,0,0)";
-      // mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
-      // mask_ctx.beginPath() ;
-      // mask_ctx.arc(parm_pos[0], parm_pos[1], 50, 0, Math.PI * 2, true);
-      //
-      // for(let i = 0; i < connections.length; i++)
-      // {
-      //   const s = connections[i][0]
-      //   const t = connections[i][1]
-      //   mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
-      //   mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
-      // }
-      // mask_ctx.strokeStyle = "rgb(0,255,0)";
-      // mask_ctx.lineWidth = 3 ;
-      // mask_ctx.stroke() ;
-
-      // mask_ctx.fillText(gesture, parm_pos[0], parm_pos[1]);
-
+      for(let i = 0; i < hand_keypoints.length; i++)
+      {
+        const [x,y] = hand_keypoints[i];
+        mask_ctx.fillRect(x-5, y-5, 10,10);
+      }
+      mask_ctx.fillStyle = "rgb(255,0,0)";
+      mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
       mask_ctx.beginPath() ;
-      mask_ctx.arc(parm_pos[0], parm_pos[1], 30*(Math.sqrt(parm_depth)/55), 0, Math.PI * 2, true);
+
+      for(let i = 0; i < connections.length; i++)
+      {
+        const s = connections[i][0]
+        const t = connections[i][1]
+        mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
+        mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+      }
+      mask_ctx.strokeStyle = "rgb(0,255,0)";
+      mask_ctx.lineWidth = 3 ;
       mask_ctx.stroke() ;
 
-      // mask_ctx.drawImage(img, parm_pos[0] - 50, parm_pos[1]- 50, 100, 100);  // ★ここを変更★
+      // mask_ctx.fillText(gesture, parm_pos[0], parm_pos[1]);
+      //
+      // mask_ctx.beginPath() ;
+      // mask_ctx.arc(parm_pos[0], parm_pos[1], 30*(Math.sqrt(parm_depth)/55), 0, Math.PI * 2, true);
+      // mask_ctx.stroke() ;
 
+      // mask_ctx.drawImage(img, parm_pos[0] - 50, parm_pos[1]- 50, 100, 100);
     }
   }
   let prev_parm_depth = 0;

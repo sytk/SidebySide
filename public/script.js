@@ -230,12 +230,10 @@ function showPDF(pdfUrl) {
     canvas.dataset.page = 1;
     showPage(1);
     document.getElementById('pdf-hide').removeAttribute('disabled');
-    document.getElementById('pdf-show').removeAttribute('disabled');
     document.getElementById('pdf-delete').removeAttribute('disabled');
     showPDFthumbnail(); // ここにおかないとダメっぽい
   }).catch(function (error) {
     // If error re-show the upload button
-    document.getElementById('pdf-loader').hide();
     document.getElementById('upload-button').show();
     alert(error.message);
   });
@@ -317,7 +315,6 @@ function showImage(imgUrl) {
   canvas.dataset.numPages = 1;
   // document.body.appendChild(canvas);
   document.getElementById('pdf-hide').removeAttribute('disabled');
-  document.getElementById('pdf-show').removeAttribute('disabled');
   document.getElementById('pdf-delete').removeAttribute('disabled');
 
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
