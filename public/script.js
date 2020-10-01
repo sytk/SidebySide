@@ -12,6 +12,7 @@ let fileNames = [];
 window.onload = () => {
   console.log("window on load");
   document.getElementById('fps').style.visibility = 'hidden';
+  document.getElementById('mask').style.visibility = 'hidden';
   /** カメラ設定 */
   const constraints = {
     audio: false,
