@@ -35,7 +35,11 @@ detector = HandGesture()
 
 
 for cat in categories:
-    if cat == 8 or cat == 6:
+    if cat == 8:
+        continue
+    if cat == 6:
+        continue
+    if cat == 9:
         continue
 
     files = glob.glob(os.path.join(dir, cat, '*.JPG'))

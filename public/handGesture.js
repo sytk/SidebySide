@@ -68,14 +68,14 @@ async function HG() {
     const fps = 1000 / (performance.now() - start);
     fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
     fps_ctx.fillText("Gesture:" + gesture, 20, 80);
-    fps_ctx.fillText(parm_depth, 20, 110);
+    fps_ctx.fillText(parm_pos[0], 20, 110);
+    fps_ctx.fillText(parm_pos[1], 20, 140);
 
     let data = new Float32Array(42);
     data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);
     let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
-
 
     updateGesture(maxIndex(predict));
 

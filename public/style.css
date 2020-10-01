@@ -66,12 +66,14 @@ video {
 
 #loading{
   position: absolute;
+  top: 50%;
+  margin-top: -50px ;
+  left: 50%;
+  margin-left: -50px ;
+  width: 60pt;
+  height: 60pt;
 
-  width: 20pt;
-  height: 20pt;
-  margin:0 auto;
   z-index: 2;
-  overflow: auto;
 }
 
 

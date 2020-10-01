@@ -88,6 +88,9 @@ function downKey(e) {
     case 'ArrowLeft':
       previousPage();
       break;
+    case 'KeyH':
+      hidePDF();
+      break;
     case 'Backspace':
       deletePDF();
       break;
@@ -225,9 +228,7 @@ function showPDF(pdfUrl) {
     canvas.dataset.numPages = numPages;
     // Show the first page
     canvas.dataset.page = 1;
-    // document.body.appendChild(canvas);
     showPage(1);
-
     document.getElementById('pdf-hide').removeAttribute('disabled');
     document.getElementById('pdf-show').removeAttribute('disabled');
     document.getElementById('pdf-delete').removeAttribute('disabled');
@@ -236,18 +237,58 @@ function showPDF(pdfUrl) {
     // If error re-show the upload button
     document.getElementById('pdf-loader').hide();
     document.getElementById('upload-button').show();
-
     alert(error.message);
   });
+
   interval = 200;
-  canvas.style.top = currentMaterialIndex*interval + 'px';
-  canvas.style.left = 0 + 'px';
+  canvas.org_top = canvas.style.top = currentMaterialIndex*interval + 'px';
+  canvas.org_left = canvas.style.left =  0 + 'px';
+
   canvas.style.width = 300 + 'px';
   canvas.dataset.scale = parseFloat(canvas.style.width) / canvas.width;
-
-  // canvas.onclick = () => currentMaterialIndex = canvas.dataset.materialIndex;
   canvas.onclick = () => updateCurrentMaterialIndex(canvas);
 }
+
+async function showPage(pageNo) {
+  let canvas = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
+    canvasCtx = canvas.getContext('2d');
+
+    canvas.dataset.page = pageNo;
+
+  // Disable Prev & Next buttons while page is being loaded
+  if (canvas.dataset.page === '1') {
+    document.getElementById('pdf-prev').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-prev').removeAttribute('disabled');
+  }
+  if (canvas.dataset.page === canvas.dataset.numPages) {
+    document.getElementById('pdf-next').setAttribute('disabled', true);
+  } else {
+    document.getElementById('pdf-next').removeAttribute('disabled');
+  }
+
+    materials[currentMaterialIndex].getPage(pageNo).then(function (page) {
+    // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+
+    let scaleRequired = canvas.width / page.getViewport(1).width;
+
+    // Get viewport of the page at required scale
+    let viewport = page.getViewport(scaleRequired);
+
+    // Set canvas height
+    canvas.height = viewport.height;
+
+    let renderContext = {
+      canvasContext: canvasCtx,
+      viewport: viewport
+    };
+
+    // Render the page contents in the canvas
+    page.render(renderContext);
+
+  });
+}
+
 function showImage(imgUrl) {
   const canvas = document.createElement("canvas");
   canvas.classList.add('resize-drag');
@@ -336,43 +377,6 @@ function drawFileName(canvasCtx, fileName) {
   canvasCtx.fillText(fileName, 50, 87, 95);
 }
 
-function showPage(pageNo) {
-  let canvas = document.getElementsByClassName('resize-drag')[currentMaterialIndex],
-    canvasCtx = canvas.getContext('2d');
-
-    canvas.dataset.page = pageNo;
-
-  // Disable Prev & Next buttons while page is being loaded
-  if (canvas.dataset.page === '1') {
-    document.getElementById('pdf-prev').setAttribute('disabled', true);
-  } else {
-    document.getElementById('pdf-prev').removeAttribute('disabled');
-  }
-  if (canvas.dataset.page === canvas.dataset.numPages) {
-    document.getElementById('pdf-next').setAttribute('disabled', true);
-  } else {
-    document.getElementById('pdf-next').removeAttribute('disabled');
-  }
-
-    materials[currentMaterialIndex].getPage(pageNo).then(function (page) {
-    // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
-    let scaleRequired = canvas.width / page.getViewport(1).width;
-
-    // Get viewport of the page at required scale
-    let viewport = page.getViewport(scaleRequired);
-
-    // Set canvas height
-    canvas.height = viewport.height;
-
-    let renderContext = {
-      canvasContext: canvasCtx,
-      viewport: viewport
-    };
-
-    // Render the page contents in the canvas
-    page.render(renderContext);
-  });
-}
 function replaceZindex(element)
 {
   let materials = document.getElementsByClassName('resize-drag');
@@ -471,20 +475,17 @@ function nextPage() {
 }
 
 // Hide the PDF
-document.getElementById('pdf-hide').onclick = function () {
+document.getElementById('pdf-hide').addEventListener("click", ()=>{ hidePDF(); });
+function hidePDF() {
   //document.getElementById('pdf-canvas').hide();
-  document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "hidden";
+  // document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "hidden";
+  let canvas =  document.getElementsByClassName('resize-drag')[currentMaterialIndex];
+  canvas.style.width = 300 + 'px';
+  canvas.style.height = 300 * canvas.height / canvas.width + 'px';
+  canvas.style.top = canvas.org_top;
+  canvas.style.left = canvas.org_left;
 }
 
-// Show the PDF
-document.getElementById('pdf-show').onclick = function () {
-  //document.getElementById('pdf-canvas').show();
-  //document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "visible";
-  let canvases = document.getElementsByClassName('resize-drag');
-  for (let i = 0; i < canvases.length; i++) {
-    document.getElementsByClassName('resize-drag')[i].style.visibility = "visible";
-  }
-}
 // Delete the PDF
 document.getElementById('pdf-delete').addEventListener("click", ()=>{ deletePDF(); });
 function deletePDF() {
