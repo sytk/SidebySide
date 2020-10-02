@@ -62,17 +62,18 @@ function video2canvas(){
     // Canvas要素を取得する
 
   //const videocanvas = document.getElementById("videocanvas");
-  const maskcanvas = document.getElementById("mask");
+  //const maskcanvas = document.getElementById("mask");
+  //var workcanvas = document.createElement('workcanvas');
   // Canvas要素の描画コントロールをOffscreenCanvasに委譲する
-  //const offscreenCanvas = maskcanvas.transferControlToOffscreen();
-  const canvas = new OffscreenCanvas(100, 1);
+  //const offscreenCanvas = workcanvas.transferControlToOffscreen();
+  //const canvas = new OffscreenCanvas(100, 1);
   // Workerを作成し、OffscreenCanvasを渡す
   //const bitmap = createImageBitmap(videocanvas);
   const worker = new Worker("handGesture.js");
   //worker.postMessage({ type: 'frame', videocanvas}[videocanvas]);
   //worker.postMessage({ canvas: "canvas"});
   //worker.postMessage({type: 'frame', imageData});
-  
+  //worker.postMessage({ canvas: "canvas"});
   worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
 
   function drow2canvas() {

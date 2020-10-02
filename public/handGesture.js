@@ -24,10 +24,11 @@ self.addEventListener('message', ({ data }) => {
     videocanvas = data.imageData;
     if (videocanvas != undefined){
       console.log(data.imageData);
-      var canvas = document.createElement('canvas');
-      var ctx = canvas.getContext('2d');
-    canvas.width = imagedata.width;
-    canvas.height = imagedata.height;
+      videocanvs = data.imageData;
+      //var canvas = data.canvas;
+      //var ctx = canvas.getContext('2d');
+    //canvas.width = imagedata.width;
+    //canvas.height = imagedata.height;
       HG()
     }
   }
@@ -95,6 +96,7 @@ async function HG() {
     mask_ctx.fillStyle = "rgb(0, 0, 255)";
 
     const start = performance.now();
+    console.log(videocanvas);
     const predictions = await landmark_model.estimateHands(videocanvas);
 
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
