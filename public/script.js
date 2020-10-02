@@ -38,50 +38,34 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    
+
     video2canvas()
 
     //HG();
   });
 };
-var videocanvas = new OffscreenCanvas(100, 1);
+var canvas = new OffscreenCanvas(100, 1);
 var imageData;
 console.log(imageData);
+const worker = new Worker("handGesture.js");
 function video2canvas(){
   var video = document.getElementById("camera");
-  var videowidth = video.videoWidth ;
-  var videoheight = video.videoHeight ;
-
-  //var videocanvas = document.getElementById("videocanvas");
-  videocanvas.width = videowidth;
-  videocanvas.height = videoheight;
-  canvasCtx = videocanvas.getContext('2d');
-  drow2canvas();
-  console.log(videocanvas);
-  const imageData = canvasCtx.getImageData(0, 0, videocanvas.width, videocanvas.height)
-    // Canvas要素を取得する
-
-  //const videocanvas = document.getElementById("videocanvas");
-  //const maskcanvas = document.getElementById("mask");
-  //var workcanvas = document.createElement('workcanvas');
-  // Canvas要素の描画コントロールをOffscreenCanvasに委譲する
-  //const offscreenCanvas = workcanvas.transferControlToOffscreen();
-  //const canvas = new OffscreenCanvas(100, 1);
-  // Workerを作成し、OffscreenCanvasを渡す
-  //const bitmap = createImageBitmap(videocanvas);
-  const worker = new Worker("handGesture.js");
-  //worker.postMessage({ type: 'frame', videocanvas}[videocanvas]);
-  //worker.postMessage({ canvas: "canvas"});
-  //worker.postMessage({type: 'frame', imageData});
-  //worker.postMessage({ canvas: "canvas"});
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
   worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
-
-  function drow2canvas() {
-    canvasCtx.drawImage(video, 0, 0);
-    requestAnimationFrame(drow2canvas);
-  };
+  sleep(1000);
+  requestAnimationFrame(video2canvas);
 };
 
+
+function sleep(waitMsec) {
+  var startMsec = new Date();
+
+  // 指定ミリ秒間だけループさせる（CPUは常にビジー状態）
+  while (new Date() - startMsec < waitMsec);
+}
 
 // モーダルウィンドウ表示
 function modalBlock() { document.getElementById('modal').style.display = 'block'; }

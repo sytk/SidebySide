@@ -1,22 +1,12 @@
-// import('https://unpkg.com/@tensorflow/tfjs@2.1.0');
-// import('https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js');
-// import('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js');
-// import('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
-// //importScripts('http://127.0.0.1:8887/public/handpose.js');
+importScripts('https://unpkg.com/@tensorflow/tfjs@2.1.0/dist/tf.min.js');
+importScripts('https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js');
+importScripts('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js');
+importScripts('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
+importScripts('./handpose.js');
 
-//import * as handpose from 'http://127.0.0.1:8887/public/handpose.js';
 var mask_canvas;
 var videocanvas;
 self.addEventListener('message', ({ data }) => {
-// onmessageイベントハンドラーでメインスレッドからのメッセージを受け取る
-//onmessage = (event) => {
-  importScripts('http://127.0.0.1:8887/public/handpose.js');
-  importScripts('https://unpkg.com/@tensorflow/tfjs@2.1.0');
-  importScripts('https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js');
-  importScripts('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js');
-  importScripts('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
-  // メインスレッドからOffscreenCanvasを受け取る
-  //mask_canvas = event.data.canvas;
   console.log("handGesutre.js");
   console.log(data);
   if (data.type === 'frame'){
@@ -25,18 +15,9 @@ self.addEventListener('message', ({ data }) => {
     if (videocanvas != undefined){
       console.log(data.imageData);
       videocanvs = data.imageData;
-      //var canvas = data.canvas;
-      //var ctx = canvas.getContext('2d');
-    //canvas.width = imagedata.width;
-    //canvas.height = imagedata.height;
-      HG()
+      HG();
     }
   }
-  //offscreenCanvas = data;
-  //console.log(offscreenCanvas.canvas);
-  // 以降、offscreenCanvasは通常のCanvasと同様に処理ができる
-  
-//};
 });
 
 async function HG() {
@@ -52,31 +33,6 @@ async function HG() {
   const landmark_model = await handpose.load();
   const gesture_model = await tf.loadLayersModel('./model/model.json');
 
-  //const video = document.getElementById('camera');
-  // var videocanvas;
-  // function outputVideo2(){
-  //   var video = document.getElementById("camera");
-    
-  //   setInterval(function(){
-  //     videocanvas = document.getElementById("videocanvas");
-  //     videocanvas.getContext("2d").drawImage(video, 0, 0, 480, 270);
-  //   }, 1000/30);
-  //   //console.log(videocanvas.height);
-  // }
-
-  // var video = document.getElementById("camera");
-  // var videowidth = video.videoWidth ;
-	// var videoheight = video.videoHeight ;
-  // var videocanvas = document.getElementById("videocanvas");
-  // videocanvas.width = videowidth;
-  // videocanvas.height = videoheight;
-  // canvasCtx = videocanvas.getContext('2d');
-  // outputVideo2();
-  // function outputVideo2() {
-  //   canvasCtx.drawImage(video, 0, 0);
-  //   requestAnimationFrame(outputVideo2);
-  // };
-  
   console.log(videocanvas.height);
   console.log(videocanvas.width);
   //const mask_canvas = document.getElementById('mask');
