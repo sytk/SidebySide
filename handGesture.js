@@ -7,7 +7,7 @@ function HG() {
   let start_time = 0;
   worker.addEventListener("message", (e)=>{
     // console.log(e.data);
-    console.log(performance.now() - start_time);
+    console.log(1000 / (performance.now() - start_time));
     video2canvas();
   });
 
