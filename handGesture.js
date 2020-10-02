@@ -1,186 +1,121 @@
-async function HG() {
-  // Load the MediaPipe handpose model assets.
-  let hand_keypoints = new Array(21);
-  let raw_hand_keypoints = new Array(21);
-  for(let i = 0; i < 21; i++) {
-    hand_keypoints[i] = new Array(2).fill(0);
-    raw_hand_keypoints[i] = new Array(2).fill(0);
-  }
-
-  const landmark_model = await handpose.load();
-  const gesture_model = await tf.loadLayersModel('./model/model.json');
-
+function HG() {
   const video = document.getElementById('camera');
-  const mask_canvas = document.getElementById('mask');
-  const mask_ctx = mask_canvas.getContext('2d');
-  await landmark_model.estimateHands(video);
-  document.getElementById("loading").remove();
-  console.log("complite loading");
+  var canvas = new OffscreenCanvas(100, 1);
 
-  const fps_canvas = document.getElementById('fps');
-  const fps_ctx = fps_canvas.getContext('2d');
+  const worker = new Worker("ML.worker.js");
 
-  fps_ctx.font = '20pt Arial';
-  mask_canvas.width = video.videoWidth;
-  mask_canvas.height = video.videoHeight;
-
-  handTracking();
-
-  async function handTracking() {
-
-    mask_ctx.fillStyle = "rgb(0, 0, 255)";
-
-    const start = performance.now();
-    const predictions = await landmark_model.estimateHands(video);
-    mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
-    fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
-
-    let has_hand = false;
-
-    for (let i = 0; i < predictions.length; i++) {
-      const keypoints = predictions[i].landmarks;
-      const raw_keypoints = predictions[i].rawLandmarks;
-
-      if (raw_keypoints[17][0] < raw_keypoints[5][0])
-      {
-        has_hand = true;
-        for (let i = 0; i < keypoints.length; i++) {
-          const [x, y, z] = keypoints[i];
-          const [raw_x, raw_y, raw_z] = raw_keypoints[i];
-          hand_keypoints[i][0] = x;
-          hand_keypoints[i][1] = y;
-          raw_hand_keypoints[i][0] = raw_x;
-          raw_hand_keypoints[i][1] = raw_y;
-        }
-
-        calcParmPos();
-        calcDepth(hand_keypoints[5], hand_keypoints[17]);
-        drawHand();
-
-        break;
-      }
-    }
-    if(!has_hand)
-    {
-      parm_pos = new Array(2).fill(undefined);
-    }
-
-    const fps = 1000 / (performance.now() - start);
-    fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
-    fps_ctx.fillText("Gesture:" + gesture, 20, 80);
-
-    let data = new Float32Array(42);
-    data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);
-    let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
-    let outputs = gesture_model.predict(inputs);
-    let predict = await outputs.data();
-
-    updateGesture(maxIndex(predict));
-
-    if(gesture == 1)
-      gesture = 0;
-
-    requestAnimationFrame(handTracking);
-    executeGestureAction();
-  }
-
-  function maxIndex(a) {
-    let index = 0
-    let value = -Infinity
-    for (let i = 0, l = a.length; i < l; i++) {
-      if (value < a[i]) {
-        value = a[i]
-        index = i
-      }
-    }
-    return index
-  };
-  const img = new Image();
-  img.src="./src/hand.png";
-
-  function drawHand()
-  {
-    const connections = [
-      [0, 1], [1, 2], [2, 3], [3, 4],
-      [5, 6], [6, 7], [7, 8],
-      [9, 10], [10, 11], [11, 12],
-      [13, 14], [14, 15], [15, 16],
-      [17, 18], [18, 19], [19, 20],
-      [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
-    ]
-    if (mask_canvas.getContext) {
-      for(let i = 0; i < hand_keypoints.length; i++)
-      {
-        const [x,y] = hand_keypoints[i];
-        mask_ctx.fillRect(x-5, y-5, 10,10);
-      }
-      mask_ctx.fillStyle = "rgb(255,0,0)";
-      mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
-      mask_ctx.beginPath() ;
-
-      for(let i = 0; i < connections.length; i++)
-      {
-        const s = connections[i][0]
-        const t = connections[i][1]
-        mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
-        mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
-      }
-      mask_ctx.strokeStyle = "rgb(0,255,0)";
-      mask_ctx.lineWidth = 3 ;
-      mask_ctx.stroke() ;
-
-      // mask_ctx.fillText(gesture, parm_pos[0], parm_pos[1]);
-      //
-      // mask_ctx.beginPath() ;
-      // mask_ctx.arc(parm_pos[0], parm_pos[1], 30*(Math.sqrt(parm_depth)/55), 0, Math.PI * 2, true);
-      // mask_ctx.stroke() ;
-
-      // mask_ctx.drawImage(img, parm_pos[0] - 50, parm_pos[1]- 50, 100, 100);
-    }
-  }
-  let prev_parm_depth = 0;
-  function calcDepth(a,b)
-  {
-    if(a.length != b.length)
-      return null;
-    let val = 0;
-    for(let i = 0; i < 2; i++)
-    {
-      val += Math.pow(b[i] - a[i], 2);
-    }
-    let k = 0.7;
-    let LPF = (1-k) * val + k * prev_parm_depth;
-    prev_parm_depth = LPF;
-    // return Math.sqrt(val);
-    parm_depth = LPF;
-  }
-  let prev_parm_pos = new Array(2).fill(0);
-  function calcParmPos()
-  {
-    let val = new Array(2).fill(0);
-    for(let i = 0; i < 2; i++)
-      val[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
-
-    let k = 0.6;
-    let LPF = new Array(2);
-    for(let i = 0; i < 2; i++)
-    {
-      LPF[i] = (1-k) * val[i] + k * prev_parm_pos[i];
-      parm_pos[i] = prev_parm_pos[i] = LPF[i];
-    }
-  }
   let start_time = 0;
-  let prev_predict = 0;
-  function updateGesture(predict)
-  {
-    if(prev_predict != predict)
-      start_time = performance.now();
-    if(performance.now() - start_time > 200)
-      gesture = predict;
-    prev_predict = predict
+  worker.addEventListener("message", (e)=>{
+    // console.log(e.data);
+    console.log(performance.now() - start_time);
+    video2canvas();
+  });
 
-  }
-}
+  video2canvas();
+
+  function video2canvas(){
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
+    start_time = performance.now();
+    worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
+    // requestAnimationFrame(video2canvas);
+  };
+
+  function sleep(waitMsec) {
+    let startMsec = new Date();
+    while (new Date() - startMsec < waitMsec);
+  };
+
+};
+
+  // Load the MediaPipe handpose model assets.
+  // let hand_keypoints = new Array(21);
+  // let raw_hand_keypoints = new Array(21);
+  // for(let i = 0; i < 21; i++) {
+  //   hand_keypoints[i] = new Array(2).fill(0);
+  //   raw_hand_keypoints[i] = new Array(2).fill(0);
+  // }
+
+
+  // const mask_canvas = document.getElementById('mask');
+  // const mask_ctx = mask_canvas.getContext('2d');
+  // await landmark_model.estimateHands(video);
+  // document.getElementById("loading").remove();
+  // console.log("complite loading");
+  //
+  // const fps_canvas = document.getElementById('fps');
+  // const fps_ctx = fps_canvas.getContext('2d');
+  //
+  // fps_ctx.font = '20pt Arial';
+  // mask_canvas.width = video.videoWidth;
+  // mask_canvas.height = video.videoHeight;
+  //
+  // handTracking();
+  //
+  // async function handTracking() {
+  //
+  //   mask_ctx.fillStyle = "rgb(0, 0, 255)";
+  //
+  //   const start = performance.now();
+  //   mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
+  //   fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
+  //
+  //   let has_hand = false;
+  //
+  //   const fps = 1000 / (performance.now() - start);
+  //   fps_ctx.fillText("fps:" + fps.toFixed(1), 20, 50);
+  //   fps_ctx.fillText("Gesture:" + gesture, 20, 80);
+  //
+  //   let data = new Float32Array(42);
+  //   data = raw_hand_keypoints.reduce((pre, current) => { pre.push(...current); return pre }, []);
+  //   let inputs = tf.tensor(data).reshape([1, 42]); // テンソルに変換
+  //   let outputs = gesture_model.predict(inputs);
+  //   let predict = await outputs.data();
+  //
+  //   updateGesture(maxIndex(predict));
+  //
+  //   if(gesture == 1)
+  //     gesture = 0;
+  //
+  //   requestAnimationFrame(handTracking);
+  //   executeGestureAction();
+  //
+  // }
+  // function drawHand()
+  // {
+  //   const connections = [
+  //     [0, 1], [1, 2], [2, 3], [3, 4],
+  //     [5, 6], [6, 7], [7, 8],
+  //     [9, 10], [10, 11], [11, 12],
+  //     [13, 14], [14, 15], [15, 16],
+  //     [17, 18], [18, 19], [19, 20],
+  //     [0, 5], [5, 9], [9, 13], [13, 17], [0, 17]
+  //   ]
+  //   if (mask_canvas.getContext) {
+  //     for(let i = 0; i < hand_keypoints.length; i++)
+  //     {
+  //       const [x,y] = hand_keypoints[i];
+  //       mask_ctx.fillRect(x-5, y-5, 10,10);
+  //     }
+  //     mask_ctx.fillStyle = "rgb(255,0,0)";
+  //     mask_ctx.fillRect(parm_pos[0], parm_pos[1], 10,10);
+  //     mask_ctx.beginPath() ;
+  //
+  //     for(let i = 0; i < connections.length; i++)
+  //     {
+  //       const s = connections[i][0]
+  //       const t = connections[i][1]
+  //       mask_ctx.moveTo( hand_keypoints[s][0],hand_keypoints[s][1]) ;
+  //       mask_ctx.lineTo( hand_keypoints[t][0],hand_keypoints[t][1]) ;
+  //     }
+  //     mask_ctx.strokeStyle = "rgb(0,255,0)";
+  //     mask_ctx.lineWidth = 3 ;
+  //     mask_ctx.stroke() ;
+  //   }
+  // }
+//}
 
 /*
 `predictions` is an array of objects describing each detected hand, for example:
