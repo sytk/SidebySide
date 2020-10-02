@@ -45,6 +45,7 @@ window.onload = () => {
   });
 };
 var videocanvas = new OffscreenCanvas(100, 1);
+//var videocanvas = document.getElementById("videocanvas");
 var imageData;
 console.log(imageData);
 function video2canvas(){
@@ -55,26 +56,26 @@ function video2canvas(){
   //var videocanvas = document.getElementById("videocanvas");
   videocanvas.width = videowidth;
   videocanvas.height = videoheight;
-  canvasCtx = videocanvas.getContext('2d');
+  //canvasCtx = videocanvas.getContext('2d');
   drow2canvas();
   console.log(videocanvas);
-  const imageData = canvasCtx.getImageData(0, 0, videocanvas.width, videocanvas.height)
+  //const imageData = canvasCtx.getImageData(0, 0, videocanvas.width, videocanvas.height)
     // Canvas要素を取得する
 
-  //const videocanvas = document.getElementById("videocanvas");
+  //videocanvas = document.getElementById("videocanvas");
   //const maskcanvas = document.getElementById("mask");
   //var workcanvas = document.createElement('workcanvas');
   // Canvas要素の描画コントロールをOffscreenCanvasに委譲する
-  //const offscreenCanvas = workcanvas.transferControlToOffscreen();
+  const offscreenCanvas = videocanvas.transferControlToOffscreen();
   //const canvas = new OffscreenCanvas(100, 1);
   // Workerを作成し、OffscreenCanvasを渡す
   //const bitmap = createImageBitmap(videocanvas);
   const worker = new Worker("handGesture.js");
   //worker.postMessage({ type: 'frame', videocanvas}[videocanvas]);
-  //worker.postMessage({ canvas: "canvas"});
+  worker.postMessage({type: 'init', videocanvas: offscreenCanvas}[offscreenCanvas]);
   //worker.postMessage({type: 'frame', imageData});
   //worker.postMessage({ canvas: "canvas"});
-  worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
+  //worker.postMessage({type: 'frame', imageData}, [imageData.data.buffer]);
 
   function drow2canvas() {
     canvasCtx.drawImage(video, 0, 0);

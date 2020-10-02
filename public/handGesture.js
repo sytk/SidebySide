@@ -19,19 +19,20 @@ self.addEventListener('message', ({ data }) => {
   //mask_canvas = event.data.canvas;
   console.log("handGesutre.js");
   console.log(data);
-  if (data.type === 'frame'){
-    console.log("found frame");
-    videocanvas = data.imageData;
-    if (videocanvas != undefined){
-      console.log(data.imageData);
-      videocanvs = data.imageData;
-      //var canvas = data.canvas;
-      //var ctx = canvas.getContext('2d');
-    //canvas.width = imagedata.width;
-    //canvas.height = imagedata.height;
-      HG()
-    }
-  }
+  console.log(data.videocanvas);
+  // if (data.type === 'frame'){
+  //   console.log("found frame");
+  //   videocanvas = data.imageData;
+  //   if (videocanvas != undefined){
+  //     console.log(data.imageData);
+  //     videocanvs = data.imageData;
+  //     //var canvas = data.canvas;
+  //     //var ctx = canvas.getContext('2d');
+  //   //canvas.width = imagedata.width;
+  //   //canvas.height = imagedata.height;
+  //     HG()
+  //   }
+  // }
   //offscreenCanvas = data;
   //console.log(offscreenCanvas.canvas);
   // 以降、offscreenCanvasは通常のCanvasと同様に処理ができる
