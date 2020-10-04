@@ -4,13 +4,21 @@ importScripts('https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-conver
 importScripts('https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js');
 importScripts('./lib/handpose.js');
 
-let canvas;
 let init_flag = true;
 let landmark_model;
 let gesture_model;
 
 // 個々の変数がWORKERで編集される
-let gesture = 0;
+
+self.addEventListener('message', ({ data }) =>
+{
+  if (data.type === 'frame'){
+    if (data.imageData != undefined){
+      HG(data.imageData);
+    }
+  }
+});
+
 let hand_keypoints = new Array(21);
 let raw_hand_keypoints = new Array(21);
 for(let i = 0; i < 21; i++) {
@@ -18,18 +26,7 @@ for(let i = 0; i < 21; i++) {
   raw_hand_keypoints[i] = new Array(2).fill(0);
 }
 
-self.addEventListener('message', ({ data }) =>
-{
-  if (data.type === 'frame'){
-    canvas = data.imageData;
-    if (canvas != undefined){
-      videocanvs = data.imageData;
-      HG();
-    }
-  }
-});
-
-async function HG() {
+async function HG(canvas) {
   if(init_flag)
   {
     landmark_model = await handpose.load();
@@ -37,15 +34,9 @@ async function HG() {
     init_flag = false;
   }
 
-  let prev_parm_depth = 0;
-  let prev_parm_pos = new Array(2).fill(0);
-  let start_time = 0;
-  let prev_predict = 0;
-
-  handTracking();
-  async function handTracking() {
+  handTracking(canvas);
+  async function handTracking(canvas) {
     const predictions = await landmark_model.estimateHands(canvas);
-
     let has_hand = false;
     if (predictions.length > 0) {
       for (let i = 0; i < predictions.length; i++) {
@@ -73,11 +64,17 @@ async function HG() {
     let outputs = gesture_model.predict(inputs);
     let predict = await outputs.data();
     predict = maxIndex(predict);
-// hand_keypoints
-// raw_hand_keypoints
-    self.postMessage(
-      {predict:predict, hand_keypoints:hand_keypoints, raw_hand_keypoints:raw_hand_keypoints}
-    );
+
+    if(has_hand)
+    {
+      self.postMessage(
+      {gesture_predict:predict, hand_keypoints:hand_keypoints, raw_hand_keypoints:raw_hand_keypoints});
+    }
+    else
+    {
+      self.postMessage(
+      {gesture_predict:undefined, hand_keypoints:undefined, raw_hand_keypoints:undefined});
+    }
   }
 
   function maxIndex(a) {
