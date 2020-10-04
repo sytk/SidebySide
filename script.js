@@ -39,7 +39,7 @@ window.onload = () => {
 
   video.addEventListener('loadeddata', (event) => {
     console.log('ready');
-    // HG();
+    HG();
   });
 };
 
