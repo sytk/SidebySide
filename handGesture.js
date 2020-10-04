@@ -96,7 +96,7 @@ function HG() {
     let val = 0;
     for(let i = 0; i < 2; i++)
       val += Math.pow(b[i] - a[i], 2);
-    let k = 0.7;
+    let k = 0.9;
     let LPF = (1-k) * val + k * prev_parm_depth;
     prev_parm_depth = LPF;
     parm_depth = LPF;
@@ -107,7 +107,7 @@ function HG() {
   {
     if(hand_keypoints == undefined)
     {
-      parm_pos = undefined;
+      parm_pos = new Array(2).fill(undefined);
       return;
     }
 
