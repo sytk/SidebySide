@@ -42,6 +42,7 @@ function HG() {
     throwJob();
   });
 
+  console.log("HG start");
   throwJob();
 
   function throwJob(){
