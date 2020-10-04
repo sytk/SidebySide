@@ -8,22 +8,25 @@ function HG() {
   let start_time = 0;
   let hand_keypoints;
   let raw_hand_keypoints;
+  let fps = 0;
 
   fps_ctx.font = '20pt Arial';
   mask_canvas.width = video.videoWidth;
   mask_canvas.height = video.videoHeight;
 
   worker.addEventListener("message", (e)=>{
+    // sleep(100);
+
     load_icon = document.getElementById("loading");
     if(load_icon != null)
       load_icon.remove();
 
-    console.log(e.data);
+    console.log("HG");
     hand_keypoints = e.data.hand_keypoints;
     raw_hand_keypoints = e.data.raw_hand_keypoints;
     let predict = e.data.gesture_predict;
 
-    let fps = 1000 / (performance.now() - start_time);
+    fps = 1000 / (performance.now() - start_time);
 
     mask_ctx.clearRect(0, 0, mask_canvas.width, mask_canvas.height);
     fps_ctx.clearRect(0, 0, fps_canvas.width, fps_canvas.height);
@@ -51,6 +54,10 @@ function HG() {
     // requestAnimationFrame(video2canvas);
   };
 
+  function sleep(waitMsec) {
+    let startMsec = new Date();
+    while (new Date() - startMsec < waitMsec);
+  }
   function drawHand()
   {
     const connections = [
@@ -96,7 +103,12 @@ function HG() {
     let val = 0;
     for(let i = 0; i < 2; i++)
       val += Math.pow(b[i] - a[i], 2);
-    let k = 0.9;
+
+    let k = 0.9 *fps/30;
+    if(k > 0.9)
+      k = 0.9;
+    console.log(k);
+
     let LPF = (1-k) * val + k * prev_parm_depth;
     prev_parm_depth = LPF;
     parm_depth = LPF;
@@ -115,7 +127,7 @@ function HG() {
     for(let i = 0; i < 2; i++)
       val[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
 
-    let k = 0.7;
+    let k = 0.7*fps/30;
     let LPF = new Array(2);
     for(let i = 0; i < 2; i++)
     {
@@ -128,9 +140,11 @@ function HG() {
   let prev_predict = 0;
   function updateGesture(predict)
   {
+    if(predict == 1)
+      predict = 0;
     if(prev_predict != predict)
       start = performance.now();
-    if(performance.now() - start > 200)
+    if(performance.now() - start > 100)
       gesture = predict;
     prev_predict = predict
   }
