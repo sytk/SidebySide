@@ -105,11 +105,11 @@ function HG() {
     for(let i = 0; i < 2; i++)
       val += Math.pow(b[i] - a[i], 2);
 
-    let k = 0.9 *fps/30;
-    if(k > 0.9)
-      k = 0.9;
-    console.log(k);
-
+    // let k = 0.9 *fps/30;
+    // if(k > 0.9)
+    //   k = 0.9;
+    // console.log(k);
+    let k = 0.9;
     let LPF = (1-k) * val + k * prev_parm_depth;
     prev_parm_depth = LPF;
     parm_depth = LPF;
@@ -128,7 +128,8 @@ function HG() {
     for(let i = 0; i < 2; i++)
       val[i] = (hand_keypoints[0][i] + hand_keypoints[5][i] + hand_keypoints[17][i]) / 3;
 
-    let k = 0.7*fps/30;
+    // let k = 0.7*fps/30;
+    let k = 0.7;
     let LPF = new Array(2);
     for(let i = 0; i < 2; i++)
     {
