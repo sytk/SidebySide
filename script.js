@@ -389,6 +389,8 @@ function executeGestureAction() {
   let y = parm_pos[1] * ratio;
   if(isNaN(x) || isNaN(y))
     x = y = -1;
+  submaterial(x);
+
   let element = document.elementFromPoint(x, y);
   if (element != null) {
     if (element.className === 'resize-drag') {
@@ -401,6 +403,7 @@ function executeGestureAction() {
       } else if (gesture === 3 && prevGesture !== 3) {
         document.getElementById('pdf-next').click();
       } else if (gesture === 5) {
+        element.hide = false;
         let scale = element.dataset.scale;
         if (prevGesture !== 5) {
           baseDepth = parm_depth / scale;
@@ -423,6 +426,22 @@ function executeGestureAction() {
     }
   }
   prevGesture = gesture;
+}
+function submaterial(x)
+{
+  let materials = document.getElementsByClassName('resize-drag');
+  if(x > 0 && x <= 300)
+  {
+    for(let i = 0; i < materials.length; i++)
+      if(materials[i].hide)
+        materials[i].style.visibility = 'visible';
+  }
+  else
+  {
+    for(let i = 0; i < materials.length; i++)
+      if(materials[i].hide)
+        materials[i].style.visibility = 'hidden';
+  }
 }
 
 // Upon click this should should trigger click on the #file-to-upload file input element
@@ -478,6 +497,8 @@ function hidePDF() {
   //document.getElementById('pdf-canvas').hide();
   // document.getElementsByClassName('resize-drag')[currentMaterialIndex].style.visibility = "hidden";
   let canvas =  document.getElementsByClassName('resize-drag')[currentMaterialIndex];
+  canvas.hide = true;
+
   canvas.style.width = 300 + 'px';
   canvas.style.height = 300 * canvas.height / canvas.width + 'px';
   canvas.style.top = canvas.org_top;
