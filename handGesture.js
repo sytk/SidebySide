@@ -109,7 +109,7 @@ function HG() {
     // if(k > 0.9)
     //   k = 0.9;
     // console.log(k);
-    let k = 0.9;
+    let k = 0.8;
     let LPF = (1-k) * val + k * prev_parm_depth;
     prev_parm_depth = LPF;
     parm_depth = LPF;
